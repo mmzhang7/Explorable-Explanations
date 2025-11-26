@@ -1,5 +1,6 @@
 import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm';
 import * as topojson from 'https://cdn.jsdelivr.net/npm/topojson-client@3/+esm';
+import { initializeIdaViewer } from './ida_viewer.js';
 
 const container = d3.select('#globe');
 const size = Math.min(window.innerWidth * 1, 700);
@@ -87,10 +88,21 @@ function zoomToStorm(d) {
         .translate(width / 2, height / 2)
         .scale(k)
         .translate(-x, -y)
-    );
+    )
+    .on('end', () => {
+      // After zooming is complete, check if it's Hurricane Ida
+      if (d.id === 'ida') {
+        d3.select('#ida-viewer').classed('hidden', false);
+        d3.select('#globe').style('opacity', 0.5); // Dim the globe
+        initializeIdaViewer(); // Call the new viewer function
+      }
+    });
 }
 
 function resetZoom() {
+  d3.select('#ida-viewer').classed('hidden', true);
+  d3.select('#globe').style('opacity', 1); 
+
   svg.transition()
     .duration(750)
     .call(zoom.transform, d3.zoomIdentity);

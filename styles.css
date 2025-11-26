@@ -7,17 +7,31 @@ body {
   padding: 1em;
 }
 
-#globe {
+#controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+#app-container {
+  display: flex;
   flex: 1;
+  gap: 20px;
+  min-height: 60vh; 
+  margin-top: 1rem;
+}
+
+#globe {
+  flex: 1; 
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 1rem;
   width: 100%;
+  transition: opacity 0.5s ease;
 }
 
 #globe svg {
-  width: 60%;
+  width: 100%; 
   height: auto;
   cursor: grab;
 }
@@ -25,6 +39,84 @@ body {
 #globe svg:active {
   cursor: grabbing;
 }
+
+/* ------------------------------------- */
+
+#ida-viewer {
+  width: 320px; 
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fcfcfc;
+  display: flex;
+  flex-direction: column;
+}
+
+#ida-viewer.hidden {
+  display: none;
+}
+
+#ida-viewer h3 {
+    margin-top: 0;
+    font-size: 1.1rem;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 8px;
+    margin-bottom: 15px;
+}
+
+#ida-viewer-canvas {
+
+    background-color: #ffffff; 
+    border: 1px solid #333;
+    align-self: center; 
+    margin-bottom: 15px;
+}
+
+
+/* Control Buttons Styles*/
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.button-container button {
+    padding: 6px 12px;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #f5f5f5;
+    transition: background-color 0.1s;
+}
+
+.button-container button:hover {
+    background-color: #e5e5e5;
+}
+
+
+/* Slider Control Styles*/
+.slider-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+#timestamp-slider {
+    flex-grow: 1;
+}
+
+#time-slider { 
+    margin-top: 15px; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+}
+#time-slider input[type="range"] { 
+    width: 100%; 
+}
+
 
 .water {
   fill: black;
@@ -46,10 +138,15 @@ body {
   stroke-width: 3px;
 }
 
+
+.cmi-pixel {
+  opacity: 0.8;
+}
+
+
 #reset-view {
   align-self: flex-start;
   padding: 0.4rem 0.8rem;
-  margin-top: 0.5rem;
   border-radius: 4px;
   border: 1px solid #ccc;
   background: #f5f5f5;
