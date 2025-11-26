@@ -1,28 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hurricane Viewer</title>
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
     <h1>Hurricane Viewer</h1>
     <div id="controls">
-      <button id="reset-view">Reset view</button>
-      <div id="status-message"></div> </div>
+        <button id="reset-view">Reset view</button>
+        <div id="status-message"></div>
+    </div>
     <div id="app-container">
         <div id="globe"></div>
         <div id="ida-viewer" class="hidden">
             <h2>Hurricane Ida (2021) CMI Time-Series</h2>
-            <div id="ida-map"></div>
-            <div id="time-slider">
-                <input type="range" min="0" max="0" value="0" id="time-step" disabled>
-                <label for="time-step" id="time-label">Time: Loading...</label>
-            </div>
         </div>
     </div>
     <a href="writeup/index.html">→ Read the Writeup</a>
     <script type="module" src="main.js"></script>
 </body>
+
 </html>

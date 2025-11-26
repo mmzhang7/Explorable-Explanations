@@ -186,13 +186,13 @@ function updateViewer(fileIndex) {
       return;
   }
   
-  const baseName = fileName.replace('_sampled.csv', '').replace('ida_', '').replace('Z', ''); 
+  const baseName = fileName.replace('_sampled.csv', '').replace('ida_', '');
   const YYYY = baseName.substring(0, 4);
   const MM = baseName.substring(4, 6);
   const DD = baseName.substring(6, 8);
   const HH = baseName.substring(9, 11); 
 
-  const displayTime = `${MM}/${DD}/${YYYY} ${HH}:00 Z`;
+  const displayTime = `${MM}/${DD}/${YYYY} ${HH}:00`;
 
   
   // Clear Canvas 
