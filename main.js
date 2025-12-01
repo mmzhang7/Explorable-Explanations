@@ -1,6 +1,7 @@
 import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm';
 import * as topojson from 'https://cdn.jsdelivr.net/npm/topojson-client@3/+esm';
 import { initializeIdaViewer } from './ida_viewer.js';
+import { initializeHarveyViewer } from './harvey_viewer.js'; 
 
 const container = d3.select('#globe');
 const size = Math.min(window.innerWidth * 1, 700);
@@ -96,11 +97,17 @@ function zoomToStorm(d) {
         d3.select('#globe').style('opacity', 0.5); // Dim the globe
         initializeIdaViewer(); // Call the new viewer function
       }
+      if (d.id === 'harvey') {
+        d3.select('#harvey-viewer').classed('hidden', false);
+        d3.select('#globe').style('opacity', 0.5);
+        initializeHarveyViewer()
+      };
     });
 }
 
 function resetZoom() {
   d3.select('#ida-viewer').classed('hidden', true);
+  d3.select('#harvey-viewer').classed('hidden', true);
   d3.select('#globe').style('opacity', 1); 
 
   svg.transition()
