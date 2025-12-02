@@ -80,7 +80,8 @@ body {
 /* Panels */
 
 #ida-viewer,
-#harvey-viewer {
+#harvey-viewer,
+#ian-viewer {
     width: 360px;
     padding: 20px;
     border: none; 
@@ -92,12 +93,14 @@ body {
 }
 
 #ida-viewer.hidden,
-#harvey-viewer.hidden {
+#harvey-viewer.hidden,
+#ian-viewer.hidden {
     display: none;
 }
 
 #ida-viewer h3,
-#harvey-viewer h3 {
+#harvey-viewer h3,
+#ian-viewer h3 {
     margin-top: 0;
     font-size: 1.3rem; 
     font-weight: 600;
@@ -108,7 +111,8 @@ body {
 }
 
 #ida-viewer-canvas,
-#harvey-viewer-canvas {
+#harvey-viewer-canvas,
+#ian-viewer-canvas {
     background-color: #000000; 
     border: 2px solid #457b9d;
     border-radius: 8px;

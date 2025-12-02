@@ -6,27 +6,27 @@ const GLOBAL_BOUNDS_GEOJSON = {
     "geometry": {
         "type": "Polygon",
         "coordinates": [[
-            [-90.9, 16.5],
-            [-90.9, 38.5],
-            [-71.9, 38.5],
-            [-71.9, 16.5],
-            [-90.9, 16.5]
+            [-90, 18],
+            [-90, 40],
+            [-71, 40],
+            [-71, 18],
+            [-90, 18]
         ]]
     }
 };
 
 // fast '_sampled.csv' files (sampled 1/3)
-const IDA_FILES = [
-  'data/ida_20210828_06Z_sampled.csv', 'data/ida_20210828_09Z_sampled.csv', 'data/ida_20210828_12Z_sampled.csv', 
-  'data/ida_20210828_15Z_sampled.csv', 'data/ida_20210828_18Z_sampled.csv', 'data/ida_20210828_21Z_sampled.csv',
-  'data/ida_20210829_00Z_sampled.csv', 'data/ida_20210829_03Z_sampled.csv', 'data/ida_20210829_06Z_sampled.csv', 
-  'data/ida_20210829_09Z_sampled.csv', 'data/ida_20210829_12Z_sampled.csv', 'data/ida_20210829_15Z_sampled.csv', 
-  'data/ida_20210829_18Z_sampled.csv', 'data/ida_20210829_21Z_sampled.csv', 'data/ida_20210830_00Z_sampled.csv', 
-  'data/ida_20210830_03Z_sampled.csv'
+const IAN_FILES = [
+  'data/ian_20220926_12Z_sampled.csv', 'data/ian_20220926_18Z_sampled.csv', 'data/ian_20220927_00Z_sampled.csv', 
+  'data/ian_20220927_06Z_sampled.csv', 'data/ian_20220927_12Z_sampled.csv', 'data/ian_20220927_18Z_sampled.csv',
+  'data/ian_20220928_00Z_sampled.csv', 'data/ian_20220928_03Z_sampled.csv', 'data/ian_20220928_06Z_sampled.csv', 
+  'data/ian_20220928_09Z_sampled.csv', 'data/ian_20220928_12Z_sampled.csv', 'data/ian_20220928_15Z_sampled.csv', 
+  'data/ian_20220928_18Z_sampled.csv', 'data/ian_20220928_21Z_sampled.csv', 'data/ian_20220929_00Z_sampled.csv', 
+  'data/ian_20220929_06Z_sampled.csv'
 ];
 
 const dataCache = {};
-const viewerId = '#ida-viewer';
+const viewerId = '#ian-viewer';
 let viewerReady = false;
 
 // Fixed dimensions (290x400)
@@ -40,7 +40,7 @@ let canvas, ctx, projection, colorScale, timestampLabel;
 
 // Data Loading
 async function loadData() {
-  const promises = IDA_FILES.map(file => {
+  const promises = IAN_FILES.map(file => {
     if (dataCache[file]) {
       return Promise.resolve(dataCache[file]);
     }
@@ -60,7 +60,7 @@ async function loadData() {
     await Promise.all(promises);
     return true;
   } catch (error) {
-    console.error('Error loading one or more Ida data files. Check file paths:', error);
+    console.error('Error loading one or more Ian data files. Check file paths:', error);
     return false;
   }
 }
@@ -71,7 +71,7 @@ function nextTimestamp() {
     const slider = d3.select('#timestamp-slider').node();
     let nextIndex = parseInt(slider.value) + 1;
 
-    if (nextIndex >= IDA_FILES.length) {
+    if (nextIndex >= IAN_FILES.length) {
         stopAnimation();
         return;
     }
@@ -84,7 +84,7 @@ function startAnimation() {
     if (timer) return; 
 
     const slider = d3.select('#timestamp-slider').node();
-    if (parseInt(slider.value) === IDA_FILES.length - 1) {
+    if (parseInt(slider.value) === IAN_FILES.length - 1) {
         resetAnimation();
     }
 
@@ -111,7 +111,7 @@ function createViewerUI() {
   const container = d3.select(viewerId);
 
   container.html('');
-  container.append('h3').text('Hurricane Ida Progression Heatmap');
+  container.append('h3').text('Hurricane Ian Progression Heatmap');
   timestampLabel = container.append('div').attr('id', 'timestamp-label');
 
   // 1. Control Buttons
@@ -140,7 +140,7 @@ function createViewerUI() {
     .attr('type', 'range')
     .attr('id', 'timestamp-slider')
     .attr('min', 0)
-    .attr('max', IDA_FILES.length - 1)
+    .attr('max', IAN_FILES.length - 1)
     .attr('value', 0)
     .attr('step', 1)
     .on('input', function() {
@@ -152,7 +152,7 @@ function createViewerUI() {
   canvas = container.append('canvas')
     .attr('width', width)
     .attr('height', height)
-    .attr('id', 'ida-viewer-canvas')
+    .attr('id', 'ian-viewer-canvas')
     .node();
   
   ctx = canvas.getContext('2d');
@@ -177,7 +177,7 @@ function createViewerUI() {
 function updateViewer(fileIndex) {
   if (!viewerReady) return;
 
-  const fileName = IDA_FILES[fileIndex];
+  const fileName = IAN_FILES[fileIndex];
   const data = dataCache[fileName]; 
 
   if (!data || data.length === 0) {
@@ -186,7 +186,7 @@ function updateViewer(fileIndex) {
       return;
   }
   
-  const baseName = fileName.replace('_sampled.csv', '').replace('ida_', '');
+  const baseName = fileName.replace('_sampled.csv', '').replace('ian_', '');
   const YYYY = baseName.substring(0, 4);
   const MM = baseName.substring(4, 6);
   const DD = baseName.substring(6, 8);
@@ -213,12 +213,12 @@ function updateViewer(fileIndex) {
   timestampLabel.text(`Timestamp: ${displayTime}`);
 }
 
-export async function initializeIdaViewer() {
+export async function initializeIanViewer() {
   const loadSuccess = await loadData();
 
   if (loadSuccess) {
     createViewerUI();
   } else {
-    d3.select(viewerId).html('<p>Error: Could not load all Hurricane Ida data files. Check file paths and accessibility.</p>');
+    d3.select(viewerId).html('<p>Error: Could not load all Hurricane Ian data files. Check file paths and accessibility.</p>');
   }
 }
