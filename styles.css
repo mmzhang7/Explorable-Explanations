@@ -79,7 +79,9 @@ body {
 
 /* Panels */
 
-#ida-viewer {
+#ida-viewer,
+#harvey-viewer,
+#ian-viewer {
     width: 360px;
     padding: 20px;
     border: none; 
@@ -90,11 +92,15 @@ body {
     flex-direction: column;
 }
 
-#ida-viewer.hidden {
+#ida-viewer.hidden,
+#harvey-viewer.hidden,
+#ian-viewer.hidden {
     display: none;
 }
 
-#ida-viewer h3 {
+#ida-viewer h3,
+#harvey-viewer h3,
+#ian-viewer h3 {
     margin-top: 0;
     font-size: 1.3rem; 
     font-weight: 600;
@@ -104,7 +110,9 @@ body {
     margin-bottom: 20px;
 }
 
-#ida-viewer-canvas {
+#ida-viewer-canvas,
+#harvey-viewer-canvas,
+#ian-viewer-canvas {
     background-color: #000000; 
     border: 2px solid #457b9d;
     border-radius: 8px;
