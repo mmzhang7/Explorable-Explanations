@@ -81,7 +81,8 @@ body {
 
 #ida-viewer,
 #harvey-viewer,
-#ian-viewer {
+#ian-viewer,
+#irma-viewer {
     width: 360px;
     padding: 20px;
     border: none; 
@@ -94,13 +95,15 @@ body {
 
 #ida-viewer.hidden,
 #harvey-viewer.hidden,
-#ian-viewer.hidden {
+#ian-viewer.hidden,
+#irma-viewer.hidden {
     display: none;
 }
 
 #ida-viewer h3,
 #harvey-viewer h3,
-#ian-viewer h3 {
+#ian-viewer h3,
+#irma-viewer h3 {
     margin-top: 0;
     font-size: 1.3rem; 
     font-weight: 600;
@@ -112,7 +115,8 @@ body {
 
 #ida-viewer-canvas,
 #harvey-viewer-canvas,
-#ian-viewer-canvas {
+#ian-viewer-canvas,
+#irma-viewer-canvas {
     background-color: #000000; 
     border: 2px solid #457b9d;
     border-radius: 8px;
@@ -220,4 +224,36 @@ body {
 
 .cmi-pixel {
     opacity: 0.8;
+}
+
+/* Base world fill */
+.country {
+  fill: #d8d8d8;
+  stroke: none;
+}
+
+/* Highlighted country borders */
+.country-outline {
+  fill: none;
+  stroke: #808080;
+  stroke-width: 0.5;
+}
+
+/* Highlighted state borders */
+.state-outline {
+  fill: none;
+  stroke: #808080;
+  stroke-width: 0.5;
+}
+
+.country-label {
+  font-size: 8px;
+  fill: #222;
+  pointer-events: none;
+}
+
+.state-label {
+  font-size: 8px;
+  fill: #222;
+  pointer-events: none;
 }
