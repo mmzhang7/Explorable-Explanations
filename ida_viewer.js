@@ -25,6 +25,15 @@ const IDA_FILES = [
   'data/ida_20210830_03Z_sampled.csv'
 ];
 
+/*const IDA_FILES = [
+  'data/ida_cloudprops_bt_20210828_06Z_sampled.csv', 'data/ida_cloudprops_bt_20210828_09Z_sampled.csv', 'data/ida_cloudprops_bt_20210828_12Z_sampled.csv', 
+  'data/ida_cloudprops_bt_20210828_15Z_sampled.csv', 'data/ida_cloudprops_bt_20210828_18Z_sampled.csv', 'data/ida_cloudprops_bt_20210828_21Z_sampled.csv',
+  'data/ida_cloudprops_bt_20210829_00Z_sampled.csv', 'data/ida_cloudprops_bt_20210829_03Z_sampled.csv', 'data/ida_cloudprops_bt_20210829_06Z_sampled.csv', 
+  'data/ida_cloudprops_bt_20210829_09Z_sampled.csv', 'data/ida_cloudprops_bt_20210829_12Z_sampled.csv', 'data/ida_cloudprops_bt_20210829_15Z_sampled.csv', 
+  'data/ida_cloudprops_bt_20210829_18Z_sampled.csv', 'data/ida_cloudprops_bt_20210829_21Z_sampled.csv', 'data/ida_cloudprops_bt_20210830_00Z_sampled.csv', 
+  'data/ida_cloudprops_bt_20210830_03Z_sampled.csv'
+];*/
+
 const dataCache = {};
 const viewerId = '#ida-viewer';
 let viewerReady = false;
