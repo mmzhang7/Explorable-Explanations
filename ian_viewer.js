@@ -186,13 +186,14 @@ function updateViewer(fileIndex) {
       return;
   }
   
-  const baseName = fileName.replace('_sampled.csv', '').replace('ian_', '');
-  const YYYY = baseName.substring(0, 4);
-  const MM = baseName.substring(4, 6);
-  const DD = baseName.substring(6, 8);
-  const HH = baseName.substring(9, 11); 
-
-  const displayTime = `${MM}/${DD}/${YYYY} ${HH}:00`;
+  const match = fileName.match(/ian_(\d{4})(\d{2})(\d{2})_(\d{2})Z/);
+  if (match) {
+    const [_, YYYY, MM, DD, HH] = match;
+    const displayTime = `${MM}/${DD}/${YYYY} ${HH}:00`;
+    timestampLabel.text(`Timestamp: ${displayTime}`);
+  } else {
+    timestampLabel.text(`Timestamp: (unknown)`);
+  }
 
   
   // Clear Canvas 

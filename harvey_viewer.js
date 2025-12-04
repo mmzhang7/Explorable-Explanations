@@ -6,23 +6,23 @@ const GLOBAL_BOUNDS_GEOJSON = {
     "geometry": {
         "type": "Polygon",
         "coordinates": [[
-            [-106.5, 17.0],
-            [-106.5, 39.0],
-            [-87.5, 39.0],
-            [-87.5, 17.0],
-            [-106.5, 17.0]
+            [-104, 24.0],
+            [-104, 46.0],
+            [-85, 46.0],
+            [-85, 24.0],
+            [-104, 24.0]
         ]]
     }
 };
 
 // fast '_sampled.csv' files (sampled 1/3)
 const HARVEY_FILES = [
-  'data/harvey_20170819_06Z_sampled.csv', 'data/harvey_20170819_09Z_sampled.csv', 'data/harvey_20170819_12Z_sampled.csv', 
-  'data/harvey_20170819_15Z_sampled.csv', 'data/harvey_20170819_18Z_sampled.csv', 'data/harvey_20170819_21Z_sampled.csv',
-  'data/harvey_20170829_00Z_sampled.csv', 'data/harvey_20170829_03Z_sampled.csv', 'data/harvey_20170829_06Z_sampled.csv', 
-  'data/harvey_20170829_09Z_sampled.csv', 'data/harvey_20170829_12Z_sampled.csv', 'data/harvey_20170829_15Z_sampled.csv', 
-  'data/harvey_20170829_18Z_sampled.csv', 'data/harvey_20170829_21Z_sampled.csv', 'data/harvey_20170830_00Z_sampled.csv', 
-  'data/harvey_20170830_03Z_sampled.csv'
+  'data/harvey_20170824_12Z_sampled.csv', 'data/harvey_20170824_18Z_sampled.csv', 'data/harvey_20170825_00Z_sampled.csv', 
+  'data/harvey_20170825_03Z_sampled.csv', 'data/harvey_20170825_06Z_sampled.csv', 'data/harvey_20170825_09Z_sampled.csv',
+  'data/harvey_20170825_12Z_sampled.csv', 'data/harvey_20170825_15Z_sampled.csv', 'data/harvey_20170825_18Z_sampled.csv', 
+  'data/harvey_20170825_21Z_sampled.csv', 'data/harvey_20170826_00Z_sampled.csv', 'data/harvey_20170826_03Z_sampled.csv', 
+  'data/harvey_20170826_06Z_sampled.csv', 'data/harvey_20170826_09Z_sampled.csv', 'data/harvey_20170826_12Z_sampled.csv', 
+  'data/harvey_20170826_15Z_sampled.csv'
 ];
 
 const dataCache = {};
@@ -186,13 +186,14 @@ function updateViewer(fileIndex) {
       return;
   }
   
-  const baseName = fileName.replace('_sampled.csv', '').replace('harvey_', '');
-  const YYYY = baseName.substring(0, 4);
-  const MM = baseName.substring(4, 6);
-  const DD = baseName.substring(6, 8);
-  const HH = baseName.substring(9, 11); 
-
-  const displayTime = `${MM}/${DD}/${YYYY} ${HH}:00`;
+  const match = fileName.match(/harvey_(\d{4})(\d{2})(\d{2})_(\d{2})Z/);
+  if (match) {
+    const [_, YYYY, MM, DD, HH] = match;
+    const displayTime = `${MM}/${DD}/${YYYY} ${HH}:00`;
+    timestampLabel.text(`Timestamp: ${displayTime}`);
+  } else {
+    timestampLabel.text(`Timestamp: (unknown)`);
+  }
 
   
   // Clear Canvas 
