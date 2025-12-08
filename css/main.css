@@ -40,6 +40,7 @@ header p {
     padding: 60px 40px;
     align-items: center;
     border-bottom: 2px solid #3498db;
+    overflow-x: hidden; /* FIX 1: Prevents horizontal overflow in sections */
 }
 
 @media (max-width: 768px) {
@@ -76,6 +77,8 @@ header p {
     display: flex;
     align-items: center;
     justify-content: center;
+    max-height: 85vh;
+    height: 100%;
 }
 
 /* PROGRESS INDICATOR */
@@ -132,34 +135,88 @@ header p {
 }
 
 #click-hurricanes-section {
-    /* Merged background property from the two proposals, using the darkest one for better contrast */
+    /* Header layout: Vertical stack */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-height: 100vh;
+    height:100%;
+    
     background: linear-gradient(to bottom, #0d1b2a, #1a237e); 
     color: white;
 }
 
+/* --- SECTION 4: CLICK HURRICANES (Globe) LAYOUT ADJUSTMENTS --- */
+
+/* 1. Shrink and center the text header */
+#click-hurricanes-section .text-content {
+    order: -1;
+    width: 100%; 
+    max-width: none;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
 #click-hurricanes-section .text-content h2 {
-    color: white;
-    border-bottom-color: #4fc3f7;
+    font-size: 1.8em;
+    border-bottom: none; 
+    padding-bottom: 0;
 }
 
-#call-to-action-section {
-    background: linear-gradient(to bottom, #ffffff, #f1f8e9);
+#click-hurricanes-section .text-content p {
+    font-size: 1em;
+    opacity: 0.8;
 }
 
-/* GLOBE SPECIFIC STYLES (for #click-hurricanes-section) */
+/* 2. Visualization Container (The 1fr 1fr grid wrapper created by JS) */
+#cities-visualization {
+    /* REMOVE width/max-width to rely on JS grid width (Fix 2) */
+    padding: 0;
+    background: none;
+    box-shadow: none;
+    min-height: auto;
+    max-width: none;
+    width: 100%; /* Ensure it fills the space available in the flex column */
+    margin: 0;
+}
+
+#cities-visualization #globe-wrapper {
+    height: 100%;
+}
 
 /* Globe container */
 #globe-container {
+    position: relative; 
     background: #0d1b2a;
     border-radius: 10px;
     border: 2px solid #4fc3f7;
     overflow: hidden;
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    height: 100% !important; /* Uses height set by JS */
+    width: 100%; /* NEW: Ensures width stays within the column */
 }
 
-/* Viewer panels (for data pop-ups/sidebars) */
+/* Viewer Panel Container (Right column) */
+#hurricane-viewers {
+    position: relative;
+    top: auto;
+    right: auto;
+    z-index: 100;
+    display: flex; 
+    flex-direction: column;
+    height: 100%; 
+    justify-content: center;
+}
+
+/* Individual Viewer Panels (Content injected via JS) */
 .viewer-panel {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    margin-bottom: 10px; 
     transition: all 0.3s ease;
+    display: block; 
 }
 
 .viewer-panel.hidden {
@@ -173,26 +230,26 @@ header p {
     align-items: center;
     gap: 20px;
     flex-wrap: wrap;
+    margin-top: 15px;
 }
 
 .instructions {
     font-size: 14px;
     color: #90a4ae;
+    text-align: center;
+    margin-top: 10px;
 }
 
 /* Storm markers animation */
-@keyframes pulse {
-    0% { r: 8; opacity: 0.7; }
-    50% { r: 10; opacity: 1; }
-    100% { r: 8; opacity: 0.7; }
-}
-
 .storm {
-    /* Uses the same pulse keyframes as .graph-placeholder, but defined for D3 circles 'r' attribute */
     animation: pulse 2s infinite;
 }
 
-/* Tooltip styles (Ensures consistency for dynamically created tooltips) */
+#globe {
+    transition: opacity 0.5s;
+}
+
+/* Tooltip styles */
 #hurricane-tooltip,
 #damage-tooltip,
 #city-details,
@@ -204,7 +261,6 @@ header p {
 
 /* Visualization Wrapper for the Dual View */
 #destructive-visualization {
-    /* Ensures the inner elements are positioned relative to this container */
     position: relative; 
 }
 
@@ -217,7 +273,7 @@ header p {
 /* Toggle Buttons */
 .toggle-btn {
     padding: 10px 20px;
-    background: #95a5a6; /* Default non-active color */
+    background: #95a5a6;
     color: white;
     border: none;
     cursor: pointer;
@@ -241,9 +297,8 @@ header p {
     border-radius: 0 5px 5px 0;
 }
 
-/* Active Toggle State (Color controlled by JS but styles defined here) */
+/* Active Toggle State */
 .toggle-btn.active {
-    /* JS sets the active background color, we ensure visual feedback here */
     font-weight: bold;
     box-shadow: 0 0 8px rgba(0,0,0,0.2);
 }
@@ -254,7 +309,7 @@ header p {
     background: #f8f9fa; 
     padding: 20px;
     border-radius: 8px;
-    box-shadow: inset 0 0 10px rgba(0,0,0,0.05); /* Subtle inner shadow */
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
 }
 
 .combined-insights h4 {
@@ -285,9 +340,9 @@ header p {
 }
 
 /* Specific Border Colors for Insights */
-.combined-insights div:nth-child(1) { border-left: 4px solid #e74c3c; } /* Damage Escalation */
-.combined-insights div:nth-child(2) { border-left: 4px solid #3498db; } /* Trend Analysis */
-.combined-insights div:nth-child(3) { border-left: 4px solid #f39c12; } /* Climate Connection */
+.combined-insights div:nth-child(1) { border-left: 4px solid #e74c3c; } 
+.combined-insights div:nth-child(2) { border-left: 4px solid #3498db; }
+.combined-insights div:nth-child(3) { border-left: 4px solid #f39c12; }
 
 /* D3 Elements Styling */
 .grid line {
@@ -310,19 +365,16 @@ header p {
     color: #34495e;
 }
 
-/* ... [Existing CSS styles above] ... */
-
 /* --- SECTION 6: PREPAREDNESS & ACTION STYLES --- */
 
-/* Tab Navigation (Reusing .view-toggle / .toggle-btn styles from DestructiveTrends but redefining container for clarity) */
+/* Tab Navigation */
 .tab-navigation {
     margin-bottom: 20px;
     text-align: center;
 }
 
-/* Tab Buttons - Specific colors are handled in JS, general styling uses .toggle-btn */
+/* Tab Buttons */
 .tab-btn {
-    /* Inherits general styles from .toggle-btn */
     padding: 10px 20px;
     border: none;
     cursor: pointer;
@@ -378,7 +430,7 @@ header p {
     color: #666;
 }
 
-/* Action Steps Grid (Using the existing .combined-insights grid for structure) */
+/* Action Steps Grid */
 .action-grid {
     margin-top: 40px;
 }
@@ -418,15 +470,14 @@ header p {
     color: #666;
 }
 
-/* Specific Border Colors for Action Steps (Using the JS colors) */
+/* Specific Border Colors for Action Steps */
 .action-grid div:nth-child(1) { border-top: 4px solid #3498db; }
 .action-grid div:nth-child(2) { border-top: 4px solid #2ecc71; }
 .action-grid div:nth-child(3) { border-top: 4px solid #f39c12; }
 .action-grid div:nth-child(4) { border-top: 4px solid #9b59b6; }
-/* Note: The 5th step 'Support Climate Action' is only in the Action Viz, not this grid */
 
 
-/* Tooltip for City/Action Details (Enhancing existing .tooltip) */
+/* Tooltip for City/Action Details */
 #action-visualization .tooltip {
     max-width: 300px;
     padding: 15px;
@@ -469,7 +520,7 @@ header p {
 }
 
 #prev-section {
-    background: #3498db; /* Blue */
+    background: #3498db;
 }
 
 #prev-section:hover:not([style*="opacity: 0.5"]) {
@@ -477,11 +528,9 @@ header p {
 }
 
 #next-section {
-    background: #2ecc71; /* Green */
+    background: #2ecc71;
 }
 
 #next-section:hover:not([style*="opacity: 0.5"]) {
     background: #27ae60;
 }
-
-/* Disabled state styling is handled via JS setting opacity to 0.5 */

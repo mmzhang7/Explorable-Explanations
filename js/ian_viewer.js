@@ -17,12 +17,12 @@ const GLOBAL_BOUNDS_GEOJSON = {
 
 // fast '_sampled.csv' files (sampled 1/3)
 const IAN_FILES = [
-  './data/ian_20220926_12Z_sampled.csv', './data/ian_20220926_18Z_sampled.csv', './data/ian_20220927_00Z_sampled.csv', 
-  './data/ian_20220927_06Z_sampled.csv', './data/ian_20220927_12Z_sampled.csv', './data/ian_20220927_18Z_sampled.csv',
-  './data/ian_20220928_00Z_sampled.csv', './data/ian_20220928_03Z_sampled.csv', './data/ian_20220928_06Z_sampled.csv', 
-  './data/ian_20220928_09Z_sampled.csv', './data/ian_20220928_12Z_sampled.csv', './data/ian_20220928_15Z_sampled.csv', 
-  './data/ian_20220928_18Z_sampled.csv', './data/ian_20220928_21Z_sampled.csv', './data/ian_20220929_00Z_sampled.csv', 
-  './data/ian_20220929_06Z_sampled.csv'
+  '../data/ian_20220926_12Z_sampled.csv', '../data/ian_20220926_18Z_sampled.csv', '../data/ian_20220927_00Z_sampled.csv', 
+  '../data/ian_20220927_06Z_sampled.csv', '../data/ian_20220927_12Z_sampled.csv', '../data/ian_20220927_18Z_sampled.csv',
+  '../data/ian_20220928_00Z_sampled.csv', '../data/ian_20220928_03Z_sampled.csv', '../data/ian_20220928_06Z_sampled.csv', 
+  '../data/ian_20220928_09Z_sampled.csv', '../data/ian_20220928_12Z_sampled.csv', '../data/ian_20220928_15Z_sampled.csv', 
+  '../data/ian_20220928_18Z_sampled.csv', '../data/ian_20220928_21Z_sampled.csv', '../data/ian_20220929_00Z_sampled.csv', 
+  '../data/ian_20220929_06Z_sampled.csv'
 ];
 
 const dataCache = {};

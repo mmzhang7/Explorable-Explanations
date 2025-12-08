@@ -44,30 +44,52 @@ export function initializeClickHurricanes() {
     container.html('<div class="graph-placeholder">Interactive globe loading...</div>');
 }
 
+// js/sections/click-hurricanes.js (Revised onEnterClickHurricanes)
+
 export function onEnterClickHurricanes() {
     console.log('Entering Click Hurricanes section');
 
     const container = d3.select('#cities-visualization');
-    // container size adjustments
-    width = container.node().getBoundingClientRect().width || 800;
+    // Calculate dimensions
+    width = container.node().getBoundingClientRect().width || 500;
     height = Math.min(width * 0.75, 500);
 
     container.html('');
 
-    // globe main container
-    const globeContainer = container.append('div')
+    // --- STEP 1: Implement a 2-Column Grid Layout inside the .visualization container ---
+    // This allows the globe to take one column and the panel/controls the other.
+    
+    // Set the .visualization container to be a dynamic grid
+    container.style('display', 'grid')
+             .style('grid-template-columns', '1fr 1fr') // 50/50 split
+             .style('gap', '20px')
+             .style('padding', '0');
+    
+    // --- Column 1: Globe Wrapper ---
+    const globeWrapper = container.append('div').attr('id', 'globe-wrapper');
+    
+    // Place Globe in Left Column (uses existing globe-container styles for background/border)
+    globeWrapper.append('div')
         .attr('id', 'globe-container')
         .style('height', `${height}px`);
+    
+    d3.select('#globe-container').append('div').attr('id', 'globe');
 
-    // SVG container
-    globeContainer.append('div')
-        .attr('id', 'globe');
 
-    // hurricane viewer panels container
-    const viewersContainer = globeContainer.append('div')
-        .attr('id', 'hurricane-viewers');
+    // --- Column 2: Panel and Controls Column ---
+    const panelColumn = container.append('div')
+        .attr('id', 'panel-column')
+        .style('display', 'flex')
+        .style('flex-direction', 'column')
+        .style('justify-content', 'center') // Center content vertically
+        .style('padding-top', '50px');
+    
+    
+    // Place Viewers Container in Right Column (Panels will flow here naturally)
+    const viewersContainer = panelColumn.append('div')
+        .attr('id', 'hurricane-viewers'); // This is where the viewer panels are attached
 
-    // individual viewer panels
+    // Individual viewer panels
     const viewers = ['ida', 'harvey', 'ian', 'irma'];
     viewers.forEach(viewer => {
         viewersContainer.append('div')
@@ -75,20 +97,15 @@ export function onEnterClickHurricanes() {
             .attr('class', 'viewer-panel hidden');
     });
 
-    // controls
-    const controls = container.append('div')
-        .attr('class', 'globe-controls');
+    // Place Controls and Instructions below the panels in the Right Column
+    panelColumn.append('div')
+        .attr('class', 'globe-controls'); // Controls
 
-    controls.append('button')
-        .attr('id', 'reset-view')
-        .attr('class', 'button-primary')
-        .text('Reset View');
-
-    // instructions (styles defined in CSS)
-    container.append('p')
-        .attr('class', 'instructions')
+    panelColumn.append('p')
+        .attr('class', 'instructions') // Instructions
         .text('Click on any hurricane marker to zoom in and view detailed data');
 
+    // Initialize the globe visualization
     initializeGlobe();
 }
 
@@ -510,6 +527,9 @@ function zoomToStorm(storm) {
             } else {
                 targetViewer.classed('hidden', false);
                 console.log(`Viewer ${storm.id} shown (hidden=${targetViewer.classed('hidden')})`);
+                if (targetViewer.style('display') === 'none') {
+                console.warn(`Panel is visible via JS class removal, but CSS display is still 'none'. Check .viewer-panel.hidden CSS rule.`);
+            }
             }
 
             // Check globe opacity
