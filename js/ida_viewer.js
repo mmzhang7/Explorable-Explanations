@@ -17,12 +17,12 @@ const GLOBAL_BOUNDS_GEOJSON = {
 
 // fast '_sampled.csv' files (sampled 1/3)
 const IDA_FILES = [
-  'data/ida_20210828_06Z_sampled.csv', 'data/ida_20210828_09Z_sampled.csv', 'data/ida_20210828_12Z_sampled.csv', 
-  'data/ida_20210828_15Z_sampled.csv', 'data/ida_20210828_18Z_sampled.csv', 'data/ida_20210828_21Z_sampled.csv',
-  'data/ida_20210829_00Z_sampled.csv', 'data/ida_20210829_03Z_sampled.csv', 'data/ida_20210829_06Z_sampled.csv', 
-  'data/ida_20210829_09Z_sampled.csv', 'data/ida_20210829_12Z_sampled.csv', 'data/ida_20210829_15Z_sampled.csv', 
-  'data/ida_20210829_18Z_sampled.csv', 'data/ida_20210829_21Z_sampled.csv', 'data/ida_20210830_00Z_sampled.csv', 
-  'data/ida_20210830_03Z_sampled.csv'
+  './data/ida_20210828_06Z_sampled.csv', './data/ida_20210828_09Z_sampled.csv', './data/ida_20210828_12Z_sampled.csv', 
+  './data/ida_20210828_15Z_sampled.csv', './data/ida_20210828_18Z_sampled.csv', './data/ida_20210828_21Z_sampled.csv',
+  './data/ida_20210829_00Z_sampled.csv', './data/ida_20210829_03Z_sampled.csv', './data/ida_20210829_06Z_sampled.csv', 
+  './data/ida_20210829_09Z_sampled.csv', './data/ida_20210829_12Z_sampled.csv', './data/ida_20210829_15Z_sampled.csv', 
+  './data/ida_20210829_18Z_sampled.csv', './data/ida_20210829_21Z_sampled.csv', './data/ida_20210830_00Z_sampled.csv', 
+  './data/ida_20210830_03Z_sampled.csv'
 ];
 
 /*const IDA_FILES = [
@@ -190,21 +190,19 @@ function updateViewer(fileIndex) {
   const data = dataCache[fileName]; 
 
   if (!data || data.length === 0) {
-      timestampLabel.text(`Timestamp: ${fileName.replace('.csv', '')} - (No Data Available)`);
-      ctx.clearRect(0, 0, width, height); 
-      return;
+    timestampLabel.text(`Timestamp: ${fileName.replace('.csv', '')} - (No Data Available)`);
+    ctx.clearRect(0, 0, width, height); 
+    return;
   }
   
+  let displayTime = '(unknown)';
   const match = fileName.match(/ida_(\d{4})(\d{2})(\d{2})_(\d{2})Z/);
   if (match) {
     const [_, YYYY, MM, DD, HH] = match;
-    const displayTime = `${MM}/${DD}/${YYYY} ${HH}:00`;
-    timestampLabel.text(`Timestamp: ${displayTime}`);
-  } else {
-    timestampLabel.text(`Timestamp: (unknown)`);
+    displayTime = `${MM}/${DD}/${YYYY} ${HH}:00`;
   }
+  timestampLabel.text(`Timestamp: ${displayTime}`);
 
-  
   // Clear Canvas 
   ctx.clearRect(0, 0, width, height);
   
@@ -213,19 +211,17 @@ function updateViewer(fileIndex) {
 
   for (const d of data) {
     const [x, y] = projection([d.lon, d.lat]);
-    
     if (x < 0 || x > width || y < 0 || y > height) continue;
 
     ctx.fillStyle = colorScale(d.CMI);
     ctx.fillRect(x - POINT_SIZE / 2, y - POINT_SIZE / 2, POINT_SIZE, POINT_SIZE);
   }
-
-  timestampLabel.text(`Timestamp: ${displayTime}`);
 }
+
 
 export async function initializeIdaViewer() {
    console.log('=== initializeIdaViewer STARTED ===');
-  onsole.log('IDA Viewer container:', d3.select('#ida-viewer').node());
+  console.log('IDA Viewer container:', d3.select('#ida-viewer').node());
   const loadSuccess = await loadData();
 
   if (loadSuccess) {

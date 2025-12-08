@@ -16,13 +16,15 @@ const GLOBAL_BOUNDS_GEOJSON = {
 };
 
 // fast '_sampled.csv' files (sampled 1/3)
+// NOTE: harvey_viewer.js lives in /js, while data files live in /data.
+// Use ../data so fetches resolve correctly when the module is loaded.
 const HARVEY_FILES = [
-  'data/harvey_20170824_12Z_sampled.csv', 'data/harvey_20170824_18Z_sampled.csv', 'data/harvey_20170825_00Z_sampled.csv', 
-  'data/harvey_20170825_03Z_sampled.csv', 'data/harvey_20170825_06Z_sampled.csv', 'data/harvey_20170825_09Z_sampled.csv',
-  'data/harvey_20170825_12Z_sampled.csv', 'data/harvey_20170825_15Z_sampled.csv', 'data/harvey_20170825_18Z_sampled.csv', 
-  'data/harvey_20170825_21Z_sampled.csv', 'data/harvey_20170826_00Z_sampled.csv', 'data/harvey_20170826_03Z_sampled.csv', 
-  'data/harvey_20170826_06Z_sampled.csv', 'data/harvey_20170826_09Z_sampled.csv', 'data/harvey_20170826_12Z_sampled.csv', 
-  'data/harvey_20170826_15Z_sampled.csv'
+  '../data/harvey_20170824_12Z_sampled.csv', '../data/harvey_20170824_18Z_sampled.csv', '../data/harvey_20170825_00Z_sampled.csv', 
+  '../data/harvey_20170825_03Z_sampled.csv', '../data/harvey_20170825_06Z_sampled.csv', '../data/harvey_20170825_09Z_sampled.csv',
+  '../data/harvey_20170825_12Z_sampled.csv', '../data/harvey_20170825_15Z_sampled.csv', '../data/harvey_20170825_18Z_sampled.csv', 
+  '../data/harvey_20170825_21Z_sampled.csv', '../data/harvey_20170826_00Z_sampled.csv', '../data/harvey_20170826_03Z_sampled.csv', 
+  '../data/harvey_20170826_06Z_sampled.csv', '../data/harvey_20170826_09Z_sampled.csv', '../data/harvey_20170826_12Z_sampled.csv', 
+  '../data/harvey_20170826_15Z_sampled.csv'
 ];
 
 const dataCache = {};
@@ -180,6 +182,9 @@ function updateViewer(fileIndex) {
   const fileName = HARVEY_FILES[fileIndex];
   const data = dataCache[fileName]; 
 
+  // Default display label
+  let displayTime = '(unknown)';
+
   if (!data || data.length === 0) {
       timestampLabel.text(`Timestamp: ${fileName.replace('.csv', '')} - (No Data Available)`);
       ctx.clearRect(0, 0, width, height); 
@@ -189,13 +194,12 @@ function updateViewer(fileIndex) {
   const match = fileName.match(/harvey_(\d{4})(\d{2})(\d{2})_(\d{2})Z/);
   if (match) {
     const [_, YYYY, MM, DD, HH] = match;
-    const displayTime = `${MM}/${DD}/${YYYY} ${HH}:00`;
-    timestampLabel.text(`Timestamp: ${displayTime}`);
-  } else {
-    timestampLabel.text(`Timestamp: (unknown)`);
+    displayTime = `${MM}/${DD}/${YYYY} ${HH}:00`;
   }
 
-  
+  // Update UI with the resolved time label once
+  timestampLabel.text(`Timestamp: ${displayTime}`);
+
   // Clear Canvas 
   ctx.clearRect(0, 0, width, height);
   
@@ -210,8 +214,6 @@ function updateViewer(fileIndex) {
     ctx.fillStyle = colorScale(d.CMI);
     ctx.fillRect(x - POINT_SIZE / 2, y - POINT_SIZE / 2, POINT_SIZE, POINT_SIZE);
   }
-
-  timestampLabel.text(`Timestamp: ${displayTime}`);
 }
 
 export async function initializeHarveyViewer() {
