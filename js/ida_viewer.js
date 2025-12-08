@@ -224,6 +224,8 @@ function updateViewer(fileIndex) {
 }
 
 export async function initializeIdaViewer() {
+   console.log('=== initializeIdaViewer STARTED ===');
+  onsole.log('IDA Viewer container:', d3.select('#ida-viewer').node());
   const loadSuccess = await loadData();
 
   if (loadSuccess) {
@@ -231,4 +233,5 @@ export async function initializeIdaViewer() {
   } else {
     d3.select(viewerId).html('<p>Error: Could not load all Hurricane Ida data files. Check file paths and accessibility.</p>');
   }
+  console.log('=== initializeIdaViewer COMPLETED ===');
 }

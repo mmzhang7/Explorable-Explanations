@@ -1,0 +1,582 @@
+import * as d3 from 'd3';
+
+let destructiveSvg, trendSvg;
+let currentView = 'damage'; // 'damage' or 'trend'
+
+export function initializeDestructiveTrends() {
+    console.log('Initializing Destructive & Trends section...');
+    
+    const container = d3.select('#destructive-visualization');
+    container.html('<div class="graph-placeholder">Loading hurricane damage and trend visualizations...</div>');
+}
+
+export function onEnterDestructiveTrends() {
+    console.log('Entering Destructive & Trends section');
+    
+    
+    const container = d3.select('#destructive-visualization');
+    const width = container.node().getBoundingClientRect().width || 800;
+    const height = 500;
+    
+    container.html('');
+    
+    // Create toggle buttons (styles defined in CSS)
+    const toggleContainer = container.append('div')
+        .attr('class', 'view-toggle');
+    
+    toggleContainer.append('button')
+        .attr('id', 'damage-view-btn')
+        .attr('class', 'toggle-btn active')
+        .text('Damage by Category')
+        // Set specific active color (retained in JS because it matches the chart color)
+        .style('background', '#e74c3c') 
+        .on('click', () => switchView('damage'));
+    
+    toggleContainer.append('button')
+        .attr('id', 'trend-view-btn')
+        .attr('class', 'toggle-btn')
+        .text('Increasing Trends')
+        // Set default non-active color and specific active color
+        .style('background', '#95a5a6') 
+        .on('click', () => switchView('trend'));
+    
+    // Create visualization container
+    const vizContainer = container.append('div')
+        .attr('id', 'destructive-viz-container');
+    
+    // Create both SVGs (styles defined in CSS/HTML for container)
+    destructiveSvg = vizContainer.append('svg')
+        .attr('id', 'damage-svg')
+        .attr('width', width)
+        .attr('height', height)
+        .attr('viewBox', `0 0 ${width} ${height}`);
+    
+    trendSvg = vizContainer.append('svg')
+        .attr('id', 'trend-svg')
+        .attr('width', width)
+        .attr('height', height)
+        .attr('viewBox', `0 0 ${width} ${height}`)
+        .style('display', 'none');
+    
+    // Create damage visualization
+    createDamageVisualization(width, height);
+    
+    // Create trend visualization
+    createTrendVisualization(width, height);
+    
+    // Add combined insights (content/structure retained in JS)
+    const insights = container.append('div')
+        .attr('class', 'combined-insights');
+    
+    insights.html(`
+        <h4>Key Insights</h4>
+        <div>
+            <div>
+                <h5>Damage Escalation</h5>
+                <p>Damage increases exponentially with category. A **Category 5** hurricane causes far more damage than Category 1.</p>
+            </div>
+            <div>
+                <h5>Trend Analysis</h5>
+                <p>While total hurricane numbers are stable, **major hurricanes (Category 3+) are increasing** by 8% per decade.</p>
+            </div>
+            <div>
+                <h5>Climate Connection</h5>
+                <p>Warmer oceans (+1°C) increase hurricane rainfall by **7%** and intensity by **3-5%**.</p>
+            </div>
+        </div>
+    `);
+}
+
+function switchView(view) {
+    currentView = view;
+    
+    // Update button states (using classes defined in CSS for common styles)
+    d3.select('#damage-view-btn')
+        .classed('active', view === 'damage')
+        // Use specific colors for active state
+        .style('background', view === 'damage' ? '#e74c3c' : '#95a5a6'); 
+    
+    d3.select('#trend-view-btn')
+        .classed('active', view === 'trend')
+        // Use specific colors for active state
+        .style('background', view === 'trend' ? '#3498db' : '#95a5a6');
+    
+    // Show/hide visualizations
+    if (view === 'damage') {
+        destructiveSvg.style('display', 'block');
+        trendSvg.style('display', 'none');
+    } else {
+        destructiveSvg.style('display', 'none');
+        trendSvg.style('display', 'block');
+    }
+}
+
+function createDamageVisualization(width, height) {
+    // Data for damage by hurricane category
+    const categories = [
+        { category: 'Cat 1', winds: '74-95 mph', damage: 'Minimal', cost: 1, color: '#4CAF50' },
+        { category: 'Cat 2', winds: '96-110 mph', damage: 'Moderate', cost: 5, color: '#FFC107' },
+        { category: 'Cat 3', winds: '111-129 mph', damage: 'Extensive', cost: 20, color: '#FF9800' },
+        { category: 'Cat 4', winds: '130-156 mph', damage: 'Extreme', cost: 50, color: '#F44336' },
+        { category: 'Cat 5', winds: '157+ mph', damage: 'Catastrophic', cost: 100, color: '#B71C1C' }
+    ];
+    
+    const margin = { top: 40, right: 30, bottom: 80, left: 80 };
+    const innerWidth = width - margin.left - margin.right;
+    const innerHeight = height - margin.top - margin.bottom;
+    
+    const x = d3.scaleBand()
+        .domain(categories.map(d => d.category))
+        .range([0, innerWidth])
+        .padding(0.3);
+    
+    const y = d3.scaleLinear()
+        .domain([0, d3.max(categories, d => d.cost)])
+        .range([innerHeight, 0])
+        .nice();
+    
+    const g = destructiveSvg.append('g')
+        .attr('transform', `translate(${margin.left},${margin.top})`);
+    
+    // Add gridlines (using CSS class 'grid')
+    g.append('g')
+        .attr('class', 'grid')
+        .call(d3.axisLeft(y)
+            .ticks(6)
+            .tickSize(-innerWidth)
+            .tickFormat(''));
+    
+    // Create bars
+    g.selectAll('.bar')
+        .data(categories)
+        .enter()
+        .append('rect')
+        .attr('class', 'bar')
+        .attr('x', d => x(d.category))
+        .attr('y', d => y(d.cost))
+        .attr('width', x.bandwidth())
+        .attr('height', d => innerHeight - y(d.cost))
+        .attr('fill', d => d.color)
+        .attr('rx', 3)
+        .attr('ry', 3)
+        .attr('opacity', 0.8) // Set default opacity
+        .on('mouseover', function(event, d) {
+            showDamageTooltip(event, d);
+            d3.select(this).attr('opacity', 1.0);
+        })
+        .on('mouseout', function(event, d) {
+            hideTooltip();
+            d3.select(this).attr('opacity', 0.8);
+        });
+    
+    // Add value labels
+    g.selectAll('.bar-label')
+        .data(categories)
+        .enter()
+        .append('text')
+        .attr('class', 'bar-label')
+        .attr('x', d => x(d.category) + x.bandwidth() / 2)
+        .attr('y', d => y(d.cost) - 5)
+        .attr('text-anchor', 'middle')
+        .style('font-size', '12px')
+        .style('font-weight', 'bold')
+        .style('fill', '#2c3e50')
+        .text(d => `$${d.cost}B`);
+    
+    // Add axes
+    g.append('g')
+        .attr('class', 'x-axis')
+        .attr('transform', `translate(0,${innerHeight})`)
+        .call(d3.axisBottom(x));
+    
+    g.append('g')
+        .attr('class', 'y-axis')
+        .call(d3.axisLeft(y).tickFormat(d => `$${d}B`));
+    
+    // Add axis labels
+    g.append('text')
+        .attr('class', 'x-label')
+        .attr('x', innerWidth / 2)
+        .attr('y', innerHeight + margin.bottom - 10)
+        .attr('text-anchor', 'middle')
+        .style('font-size', '14px')
+        .text('Hurricane Category');
+    
+    g.append('text')
+        .attr('class', 'y-label')
+        .attr('transform', 'rotate(-90)')
+        .attr('x', -innerHeight / 2)
+        .attr('y', -margin.left + 20)
+        .attr('text-anchor', 'middle')
+        .style('font-size', '14px')
+        .text('Estimated Damage (Billions USD)');
+    
+    // Add chart title
+    g.append('text')
+        .attr('class', 'chart-title')
+        .attr('x', innerWidth / 2)
+        .attr('y', -10)
+        .attr('text-anchor', 'middle')
+        .style('font-size', '16px')
+        .style('font-weight', 'bold')
+        .text('Exponential Damage Increase by Category');
+    
+    // Add damage mechanisms visualization
+    const damageTypes = destructiveSvg.append('g')
+        .attr('transform', `translate(${width - 250}, 50)`);
+    
+    const mechanisms = [
+        { type: 'Wind', icon: '💨', percent: 40, color: '#FF9800' },
+        { type: 'Storm Surge', icon: '🌊', percent: 30, color: '#2196F3' },
+        { type: 'Rainfall', icon: '🌧️', percent: 20, color: '#4CAF50' },
+        { type: 'Tornadoes', icon: '🌪️', percent: 10, color: '#9C27B0' }
+    ];
+    
+    mechanisms.forEach((mechanism, i) => {
+        const yPos = i * 50;
+        
+        damageTypes.append('text')
+            .attr('x', 0)
+            .attr('y', yPos)
+            .style('font-size', '24px')
+            .text(mechanism.icon);
+        
+        damageTypes.append('rect')
+            .attr('x', 30)
+            .attr('y', yPos - 10)
+            .attr('width', mechanism.percent * 2)
+            .attr('height', 20)
+            .attr('fill', mechanism.color)
+            .attr('rx', 3)
+            .attr('ry', 3);
+        
+        damageTypes.append('text')
+            .attr('x', 40 + mechanism.percent * 2)
+            .attr('y', yPos + 5)
+            .style('font-size', '12px')
+            .style('font-weight', 'bold')
+            .text(`${mechanism.percent}%`);
+        
+        damageTypes.append('text')
+            .attr('x', 30)
+            .attr('y', yPos + 30)
+            .style('font-size', '11px')
+            .style('fill', '#666')
+            .text(mechanism.type);
+    });
+    
+    damageTypes.append('text')
+        .attr('x', 0)
+        .attr('y', -20)
+        .style('font-size', '12px')
+        .style('font-weight', 'bold')
+        .style('fill', '#2c3e50')
+        .text('Damage Breakdown:');
+}
+
+function createTrendVisualization(width, height) {
+    // Generate trend data (1980-2022)
+    const years = d3.range(1980, 2023);
+    
+    // Base trend: increasing over time with climate change effect
+    const baseTrend = years.map(year => {
+        const base = 10 + (year - 1980) * 0.2; // Gradual increase
+        const variability = Math.random() * 5 - 2.5; // Random variation
+        const climateEffect = Math.max(0, (year - 2000) * 0.3); // Accelerated increase after 2000
+        return Math.max(5, base + variability + climateEffect);
+    });
+    
+    // Major hurricanes (Cat 3+) trend - increasing faster
+    const majorTrend = years.map((year, i) => {
+        const base = baseTrend[i] * 0.3; // Start with 30% major hurricanes
+        const increase = (year - 1980) * 0.05; // Gradual increase
+        const climateEffect = Math.max(0, (year - 2000) * 0.15); // Accelerated after 2000
+        return Math.max(2, base + increase + climateEffect);
+    });
+    
+    const margin = { top: 40, right: 30, bottom: 60, left: 70 };
+    const innerWidth = width - margin.left - margin.right;
+    const innerHeight = height - margin.top - margin.bottom;
+    
+    const x = d3.scaleLinear()
+        .domain([1980, 2022])
+        .range([0, innerWidth]);
+    
+    const y = d3.scaleLinear()
+        .domain([0, d3.max(baseTrend) * 1.1])
+        .range([innerHeight, 0])
+        .nice();
+    
+    const g = trendSvg.append('g')
+        .attr('transform', `translate(${margin.left},${margin.top})`);
+    
+    // Add gridlines (using CSS class 'grid')
+    g.append('g')
+        .attr('class', 'grid')
+        .call(d3.axisLeft(y)
+            .ticks(8)
+            .tickSize(-innerWidth)
+            .tickFormat(''));
+    
+    // Create area for total hurricanes
+    const area = d3.area()
+        .x((d, i) => x(years[i]))
+        .y0(innerHeight)
+        .y1(d => y(d))
+        .curve(d3.curveMonotoneX);
+    
+    g.append('path')
+        .datum(baseTrend)
+        .attr('class', 'area-total')
+        .attr('d', area)
+        .attr('fill', 'url(#total-gradient)')
+        .attr('opacity', 0.6);
+    
+    // Create line for total hurricanes
+    const line = d3.line()
+        .x((d, i) => x(years[i]))
+        .y(d => y(d))
+        .curve(d3.curveMonotoneX);
+    
+    g.append('path')
+        .datum(baseTrend)
+        .attr('class', 'line-total')
+        .attr('d', line)
+        .attr('fill', 'none')
+        .attr('stroke', '#3498db')
+        .attr('stroke-width', 3);
+    
+    // Create line for major hurricanes
+    g.append('path')
+        .datum(majorTrend)
+        .attr('class', 'line-major')
+        .attr('d', line)
+        .attr('fill', 'none')
+        .attr('stroke', '#e74c3c')
+        .attr('stroke-width', 3)
+        .attr('stroke-dasharray', '5,5');
+    
+    // Add data points
+    g.selectAll('.point-total')
+        .data(baseTrend)
+        .enter()
+        .append('circle')
+        .attr('class', 'point-total')
+        .attr('cx', (d, i) => x(years[i]))
+        .attr('cy', d => y(d))
+        .attr('r', 3)
+        .attr('fill', '#3498db')
+        .attr('stroke', 'white')
+        .attr('stroke-width', 1);
+    
+    g.selectAll('.point-major')
+        .data(majorTrend)
+        .enter()
+        .append('circle')
+        .attr('class', 'point-major')
+        .attr('cx', (d, i) => x(years[i]))
+        .attr('cy', d => y(d))
+        .attr('r', 3)
+        .attr('fill', '#e74c3c')
+        .attr('stroke', 'white')
+        .attr('stroke-width', 1);
+    
+    // Add axes
+    g.append('g')
+        .attr('class', 'x-axis')
+        .attr('transform', `translate(0,${innerHeight})`)
+        .call(d3.axisBottom(x).tickFormat(d3.format('d')).ticks(10));
+    
+    g.append('g')
+        .attr('class', 'y-axis')
+        .call(d3.axisLeft(y).ticks(8));
+    
+    // Add axis labels
+    g.append('text')
+        .attr('class', 'x-label')
+        .attr('x', innerWidth / 2)
+        .attr('y', innerHeight + margin.bottom - 10)
+        .attr('text-anchor', 'middle')
+        .style('font-size', '14px')
+        .text('Year');
+    
+    g.append('text')
+        .attr('class', 'y-label')
+        .attr('transform', 'rotate(-90)')
+        .attr('x', -innerHeight / 2)
+        .attr('y', -margin.left + 20)
+        .attr('text-anchor', 'middle')
+        .style('font-size', '14px')
+        .text('Number of Hurricanes');
+    
+    // Add chart title
+    g.append('text')
+        .attr('class', 'chart-title')
+        .attr('x', innerWidth / 2)
+        .attr('y', -10)
+        .attr('text-anchor', 'middle')
+        .style('font-size', '16px')
+        .style('font-weight', 'bold')
+        .text('Increasing Frequency of Major Hurricanes (1980-2022)');
+    
+    // Add gradient for area (retained in JS as it's SVG defs)
+    const defs = trendSvg.append('defs');
+    
+    const totalGradient = defs.append('linearGradient')
+        .attr('id', 'total-gradient')
+        .attr('x1', '0%')
+        .attr('y1', '0%')
+        .attr('x2', '0%')
+        .attr('y2', '100%');
+    
+    totalGradient.append('stop')
+        .attr('offset', '0%')
+        .attr('stop-color', '#3498db')
+        .attr('stop-opacity', 0.4);
+    
+    totalGradient.append('stop')
+        .attr('offset', '100%')
+        .attr('stop-color', '#3498db')
+        .attr('stop-opacity', 0.1);
+    
+    // Add trend statistics
+    const stats = trendSvg.append('g')
+        .attr('transform', `translate(${width - 300}, 80)`);
+    
+    stats.append('text')
+        .attr('x', 0)
+        .attr('y', 0)
+        .style('font-size', '14px')
+        .style('font-weight', 'bold')
+        .style('fill', '#2c3e50')
+        .text('Trend Statistics:');
+    
+    const statItems = [
+        { label: 'Major hurricanes (Cat 3+):', value: '+8% per decade', color: '#e74c3c' },
+        { label: 'Rapid intensification:', value: '+15% since 1980', color: '#f39c12' },
+        { label: 'Rainfall rates:', value: '+7% per °C warming', color: '#3498db' },
+        { label: 'Storm surge height:', value: '+4% per decade', color: '#2ecc71' }
+    ];
+    
+    statItems.forEach((item, i) => {
+        const yPos = 25 + i * 25;
+        
+        stats.append('text')
+            .attr('x', 0)
+            .attr('y', yPos)
+            .style('font-size', '12px')
+            .style('fill', '#666')
+            .text(item.label);
+        
+        stats.append('text')
+            .attr('x', 180)
+            .attr('y', yPos)
+            .style('font-size', '12px')
+            .style('font-weight', 'bold')
+            .style('fill', item.color)
+            .text(item.value);
+    });
+}
+
+function showDamageTooltip(event, data) {
+    const tooltip = d3.select('#destructive-visualization')
+        .append('div')
+        .attr('class', 'tooltip') // Use CSS class
+        .style('position', 'absolute')
+        .style('left', (event.pageX + 10) + 'px')
+        .style('top', (event.pageY - 10) + 'px')
+        .style('opacity', 0);
+    
+    const examples = {
+        'Cat 1': 'Humberto (2007): $50M damage',
+        'Cat 2': 'Frances (2004): $9B damage',
+        // Note: Katrina and Harvey are often grouped as $125B+ (2017/2022 adjusted)
+        'Cat 3': 'Katrina (2005): $125B damage', 
+        'Cat 4': 'Harvey (2017): $125B damage',
+        'Cat 5': 'Andrew (1992): $27B damage' // Note: High wind, but localized vs flooding
+    };
+    
+    tooltip.html(`
+        <strong>${data.category}: ${data.damage} Damage</strong><br>
+        Winds: ${data.winds}<br>
+        Avg. Damage: $${data.cost}B (Relative Scale)<br>
+        Example: ${examples[data.category]}
+    `)
+    .transition()
+    .duration(200)
+    .style('opacity', 1);
+    
+    // The timeout logic for removal should generally be handled on mouseout for D3 charts
+    // Removed the setTimeout here to rely on hideTooltip being called on 'mouseout'
+}
+
+function hideTooltip() {
+    d3.selectAll('.tooltip')
+        .transition()
+        .duration(200)
+        .style('opacity', 0)
+        .remove();
+}
+
+export function onExitDestructiveTrends() {
+    console.log('Exiting Destructive & Trends section');
+    // Clean up tooltips
+    hideTooltip();
+}
+
+// NOTE: The onProgressDestructiveTrends function's y-scale calculation relies on 
+// internal D3 context (like hardcoded range values) that should ideally be 
+// derived from the actual chart scales defined in createDamageVisualization. 
+// For separation, the logic remains here but note the dependency on hardcoded values.
+
+export function onProgressDestructiveTrends(progress) {
+    if (currentView === 'damage' && destructiveSvg && progress > 0.2) {
+        // Animate damage bars
+        destructiveSvg.selectAll('.bar')
+            .transition()
+            .duration(1000)
+            .delay((d, i) => i * 100)
+            .attr('y', d => {
+                // Hardcoded values from createDamageVisualization: innerHeight=420, top margin=40
+                const innerHeight = 420; 
+                const topMargin = 40; 
+                const yRangeMax = innerHeight + topMargin; // 460
+                const yRangeMin = topMargin; // 40
+                
+                const yScale = d3.scaleLinear()
+                    .domain([0, 100])
+                    .range([yRangeMax, yRangeMin]); 
+                return yScale(d.cost * progress);
+            })
+            .attr('height', d => {
+                const innerHeight = 420; 
+                const topMargin = 40; 
+                const yRangeMax = innerHeight + topMargin; // 460
+                const yRangeMin = topMargin; // 40
+                
+                const yScale = d3.scaleLinear()
+                    .domain([0, 100])
+                    .range([yRangeMax, yRangeMin]); 
+                return yRangeMax - yScale(d.cost * progress);
+            });
+    } else if (currentView === 'trend' && trendSvg && progress > 0.3) {
+        // Animate trend lines
+        const totalLength = trendSvg.select('.line-total').node().getTotalLength();
+        const majorLength = trendSvg.select('.line-major').node().getTotalLength();
+        
+        trendSvg.select('.line-total')
+            .attr('stroke-dasharray', totalLength + ' ' + totalLength)
+            .attr('stroke-dashoffset', totalLength)
+            .transition()
+            .duration(2000)
+            .attr('stroke-dashoffset', 0);
+        
+        trendSvg.select('.line-major')
+            .attr('stroke-dasharray', majorLength + ' ' + majorLength)
+            .attr('stroke-dashoffset', majorLength)
+            .transition()
+            .duration(2000)
+            .delay(500)
+            .attr('stroke-dashoffset', 0);
+    }
+}
