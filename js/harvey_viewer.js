@@ -16,13 +16,15 @@ const GLOBAL_BOUNDS_GEOJSON = {
 };
 
 // fast '_sampled.csv' files (sampled 1/3)
+// NOTE: harvey_viewer.js lives in /js, while data files live in /data.
+// Use ../data so fetches resolve correctly when the module is loaded.
 const HARVEY_FILES = [
-  './data/harvey_20170824_12Z_sampled.csv', './data/harvey_20170824_18Z_sampled.csv', './data/harvey_20170825_00Z_sampled.csv', 
-  './data/harvey_20170825_03Z_sampled.csv', './data/harvey_20170825_06Z_sampled.csv', './data/harvey_20170825_09Z_sampled.csv',
-  './data/harvey_20170825_12Z_sampled.csv', './data/harvey_20170825_15Z_sampled.csv', './data/harvey_20170825_18Z_sampled.csv', 
-  './data/harvey_20170825_21Z_sampled.csv', './data/harvey_20170826_00Z_sampled.csv', './data/harvey_20170826_03Z_sampled.csv', 
-  './data/harvey_20170826_06Z_sampled.csv', './data/harvey_20170826_09Z_sampled.csv', './data/harvey_20170826_12Z_sampled.csv', 
-  './data/harvey_20170826_15Z_sampled.csv'
+  '../data/harvey_20170824_12Z_sampled.csv', '../data/harvey_20170824_18Z_sampled.csv', '../data/harvey_20170825_00Z_sampled.csv', 
+  '../data/harvey_20170825_03Z_sampled.csv', '../data/harvey_20170825_06Z_sampled.csv', '../data/harvey_20170825_09Z_sampled.csv',
+  '../data/harvey_20170825_12Z_sampled.csv', '../data/harvey_20170825_15Z_sampled.csv', '../data/harvey_20170825_18Z_sampled.csv', 
+  '../data/harvey_20170825_21Z_sampled.csv', '../data/harvey_20170826_00Z_sampled.csv', '../data/harvey_20170826_03Z_sampled.csv', 
+  '../data/harvey_20170826_06Z_sampled.csv', '../data/harvey_20170826_09Z_sampled.csv', '../data/harvey_20170826_12Z_sampled.csv', 
+  '../data/harvey_20170826_15Z_sampled.csv'
 ];
 
 const dataCache = {};
