@@ -17,12 +17,12 @@ const GLOBAL_BOUNDS_GEOJSON = {
 
 // fast '_sampled.csv' files (sampled 1/3)
 const IRMA_FILES = [
-  'data/irma_20170905_00Z_sampled.csv', 'data/irma_20170905_06Z_sampled.csv', 'data/irma_20170905_12Z_sampled.csv', 
-  'data/irma_20170905_18Z_sampled.csv', 'data/irma_20170906_00Z_sampled.csv', 'data/irma_20170906_03Z_sampled.csv',
-  'data/irma_20170906_06Z_sampled.csv', 'data/irma_20170906_09Z_sampled.csv', 'data/irma_20170906_12Z_sampled.csv', 
-  'data/irma_20170906_15Z_sampled.csv', 'data/irma_20170906_18Z_sampled.csv', 'data/irma_20170906_21Z_sampled.csv', 
-  'data/irma_20170907_00Z_sampled.csv', 'data/irma_20170907_03Z_sampled.csv', 'data/irma_20170907_06Z_sampled.csv', 
-  'data/irma_20170907_09Z_sampled.csv'
+  './data/irma_20170905_00Z_sampled.csv', './data/irma_20170905_06Z_sampled.csv', './data/irma_20170905_12Z_sampled.csv', 
+  './data/irma_20170905_18Z_sampled.csv', './data/irma_20170906_00Z_sampled.csv', './data/irma_20170906_03Z_sampled.csv',
+  './data/irma_20170906_06Z_sampled.csv', './data/irma_20170906_09Z_sampled.csv', './data/irma_20170906_12Z_sampled.csv', 
+  './data/irma_20170906_18Z_sampled.csv', './data/irma_20170906_21Z_sampled.csv', 
+  './data/irma_20170907_00Z_sampled.csv', './data/irma_20170907_03Z_sampled.csv', './data/irma_20170907_06Z_sampled.csv', 
+  './data/irma_20170907_09Z_sampled.csv'
 ];
 
 const dataCache = {};
