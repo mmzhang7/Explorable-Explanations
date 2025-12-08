@@ -180,6 +180,9 @@ function updateViewer(fileIndex) {
   const fileName = HARVEY_FILES[fileIndex];
   const data = dataCache[fileName]; 
 
+  // Default display label
+  let displayTime = '(unknown)';
+
   if (!data || data.length === 0) {
       timestampLabel.text(`Timestamp: ${fileName.replace('.csv', '')} - (No Data Available)`);
       ctx.clearRect(0, 0, width, height); 
@@ -189,13 +192,12 @@ function updateViewer(fileIndex) {
   const match = fileName.match(/harvey_(\d{4})(\d{2})(\d{2})_(\d{2})Z/);
   if (match) {
     const [_, YYYY, MM, DD, HH] = match;
-    const displayTime = `${MM}/${DD}/${YYYY} ${HH}:00`;
-    timestampLabel.text(`Timestamp: ${displayTime}`);
-  } else {
-    timestampLabel.text(`Timestamp: (unknown)`);
+    displayTime = `${MM}/${DD}/${YYYY} ${HH}:00`;
   }
 
-  
+  // Update UI with the resolved time label once
+  timestampLabel.text(`Timestamp: ${displayTime}`);
+
   // Clear Canvas 
   ctx.clearRect(0, 0, width, height);
   
@@ -210,8 +212,6 @@ function updateViewer(fileIndex) {
     ctx.fillStyle = colorScale(d.CMI);
     ctx.fillRect(x - POINT_SIZE / 2, y - POINT_SIZE / 2, POINT_SIZE, POINT_SIZE);
   }
-
-  timestampLabel.text(`Timestamp: ${displayTime}`);
 }
 
 export async function initializeHarveyViewer() {
