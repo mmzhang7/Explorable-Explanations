@@ -17,12 +17,12 @@ const GLOBAL_BOUNDS_GEOJSON = {
 
 // fast '_sampled.csv' files (sampled 1/3)
 const IAN_FILES = [
-  'data/ian_20220926_12Z_sampled.csv', 'data/ian_20220926_18Z_sampled.csv', 'data/ian_20220927_00Z_sampled.csv', 
-  'data/ian_20220927_06Z_sampled.csv', 'data/ian_20220927_12Z_sampled.csv', 'data/ian_20220927_18Z_sampled.csv',
-  'data/ian_20220928_00Z_sampled.csv', 'data/ian_20220928_03Z_sampled.csv', 'data/ian_20220928_06Z_sampled.csv', 
-  'data/ian_20220928_09Z_sampled.csv', 'data/ian_20220928_12Z_sampled.csv', 'data/ian_20220928_15Z_sampled.csv', 
-  'data/ian_20220928_18Z_sampled.csv', 'data/ian_20220928_21Z_sampled.csv', 'data/ian_20220929_00Z_sampled.csv', 
-  'data/ian_20220929_06Z_sampled.csv'
+  '../data/ian_20220926_12Z_sampled.csv', '../data/ian_20220926_18Z_sampled.csv', '../data/ian_20220927_00Z_sampled.csv', 
+  '../data/ian_20220927_06Z_sampled.csv', '../data/ian_20220927_12Z_sampled.csv', '../data/ian_20220927_18Z_sampled.csv',
+  '../data/ian_20220928_00Z_sampled.csv', '../data/ian_20220928_03Z_sampled.csv', '../data/ian_20220928_06Z_sampled.csv', 
+  '../data/ian_20220928_09Z_sampled.csv', '../data/ian_20220928_12Z_sampled.csv', '../data/ian_20220928_15Z_sampled.csv', 
+  '../data/ian_20220928_18Z_sampled.csv', '../data/ian_20220928_21Z_sampled.csv', '../data/ian_20220929_00Z_sampled.csv', 
+  '../data/ian_20220929_06Z_sampled.csv'
 ];
 
 const dataCache = {};
@@ -175,43 +175,41 @@ function createViewerUI() {
  */
 
 function updateViewer(fileIndex) {
-  if (!viewerReady) return;
+    if (!viewerReady) return;
 
-  const fileName = IAN_FILES[fileIndex];
-  const data = dataCache[fileName]; 
+    const fileName = IAN_FILES[fileIndex];
+    const data = dataCache[fileName]; 
 
-  if (!data || data.length === 0) {
-      timestampLabel.text(`Timestamp: ${fileName.replace('.csv', '')} - (No Data Available)`);
-      ctx.clearRect(0, 0, width, height); 
-      return;
-  }
-  
-  const match = fileName.match(/ian_(\d{4})(\d{2})(\d{2})_(\d{2})Z/);
-  if (match) {
-    const [_, YYYY, MM, DD, HH] = match;
-    const displayTime = `${MM}/${DD}/${YYYY} ${HH}:00`;
-    timestampLabel.text(`Timestamp: ${displayTime}`);
-  } else {
-    timestampLabel.text(`Timestamp: (unknown)`);
-  }
-
-  
-  // Clear Canvas 
-  ctx.clearRect(0, 0, width, height);
-  
-  // Draw Heatmap Points
-  ctx.globalAlpha = 0.5;
-
-  for (const d of data) {
-    const [x, y] = projection([d.lon, d.lat]);
+    if (!data || data.length === 0) {
+        timestampLabel.text(`Timestamp: ${fileName.replace('.csv', '')} - (No Data Available)`);
+        ctx.clearRect(0, 0, width, height); 
+        return;
+    }
     
-    if (x < 0 || x > width || y < 0 || y > height) continue;
+    const match = fileName.match(/ian_(\d{4})(\d{2})(\d{2})_(\d{2})Z/);
+    if (match) {
+        const [_, YYYY, MM, DD, HH] = match;
+        const displayTime = `${MM}/${DD}/${YYYY} ${HH}:00`;
+        timestampLabel.text(`Timestamp: ${displayTime}`); 
+    } else {
+        timestampLabel.text(`Timestamp: (unknown)`);
+    }
 
-    ctx.fillStyle = colorScale(d.CMI);
-    ctx.fillRect(x - POINT_SIZE / 2, y - POINT_SIZE / 2, POINT_SIZE, POINT_SIZE);
-  }
+    
+    // Clear Canvas 
+    ctx.clearRect(0, 0, width, height);
+    
+    // Draw Heatmap Points 
+    ctx.globalAlpha = 0.5;
 
-  timestampLabel.text(`Timestamp: ${displayTime}`);
+    for (const d of data) {
+        const [x, y] = projection([d.lon, d.lat]);
+        
+        if (x < 0 || x > width || y < 0 || y > height) continue;
+
+        ctx.fillStyle = colorScale(d.CMI);
+        ctx.fillRect(x - POINT_SIZE / 2, y - POINT_SIZE / 2, POINT_SIZE, POINT_SIZE);
+    } 
 }
 
 export async function initializeIanViewer() {
