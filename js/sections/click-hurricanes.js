@@ -559,7 +559,9 @@ export function onExitClickHurricanes() {
     console.log('Exiting Click Hurricanes section');
     d3.select('#storm-tooltip').remove();
     tooltip = null;
-    resetZoom();
+    if (direction === 'up') {
+        resetZoom();
+    }
 }
 
 export function onProgressClickHurricanes(progress) {
