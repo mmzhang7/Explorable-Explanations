@@ -1,32 +1,34 @@
 import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm';
 
-// Global coordinate bounds for Hurricane Irma data
+// Global coordinate bounds for Hurricane Harvey data
 const GLOBAL_BOUNDS_GEOJSON = {
     "type": "Feature",
     "geometry": {
         "type": "Polygon",
         "coordinates": [[
-            [-65, 12],
-            [-65, 30],
-            [-65, 30],
-            [-45, 12],
-            [-65, 12]
+            [-104, 24.0],
+            [-104, 46.0],
+            [-85, 46.0],
+            [-85, 24.0],
+            [-104, 24.0]
         ]]
     }
 };
 
 // fast '_sampled.csv' files (sampled 1/3)
-const IRMA_FILES = [
-  'data/irma_20170905_00Z_sampled.csv', 'data/irma_20170905_06Z_sampled.csv', 'data/irma_20170905_12Z_sampled.csv', 
-  'data/irma_20170905_18Z_sampled.csv', 'data/irma_20170906_00Z_sampled.csv', 'data/irma_20170906_03Z_sampled.csv',
-  'data/irma_20170906_06Z_sampled.csv', 'data/irma_20170906_09Z_sampled.csv', 'data/irma_20170906_12Z_sampled.csv', 
-  'data/irma_20170906_15Z_sampled.csv', 'data/irma_20170906_18Z_sampled.csv', 'data/irma_20170906_21Z_sampled.csv', 
-  'data/irma_20170907_00Z_sampled.csv', 'data/irma_20170907_03Z_sampled.csv', 'data/irma_20170907_06Z_sampled.csv', 
-  'data/irma_20170907_09Z_sampled.csv'
+// NOTE: harvey_viewer.js lives in /js, while data files live in /data.
+// Use ../data so fetches resolve correctly when the module is loaded.
+const HARVEY_FILES = [
+  '../data/harvey_20170824_12Z_sampled.csv', '../data/harvey_20170824_18Z_sampled.csv', '../data/harvey_20170825_00Z_sampled.csv', 
+  '../data/harvey_20170825_03Z_sampled.csv', '../data/harvey_20170825_06Z_sampled.csv', '../data/harvey_20170825_09Z_sampled.csv',
+  '../data/harvey_20170825_12Z_sampled.csv', '../data/harvey_20170825_15Z_sampled.csv', '../data/harvey_20170825_18Z_sampled.csv', 
+  '../data/harvey_20170825_21Z_sampled.csv', '../data/harvey_20170826_00Z_sampled.csv', '../data/harvey_20170826_03Z_sampled.csv', 
+  '../data/harvey_20170826_06Z_sampled.csv', '../data/harvey_20170826_09Z_sampled.csv', '../data/harvey_20170826_12Z_sampled.csv', 
+  '../data/harvey_20170826_15Z_sampled.csv'
 ];
 
 const dataCache = {};
-const viewerId = '#irma-viewer';
+const viewerId = '#harvey-viewer';
 let viewerReady = false;
 
 // Fixed dimensions (290x400)
@@ -40,7 +42,7 @@ let canvas, ctx, projection, colorScale, timestampLabel;
 
 // Data Loading
 async function loadData() {
-  const promises = IRMA_FILES.map(file => {
+  const promises = HARVEY_FILES.map(file => {
     if (dataCache[file]) {
       return Promise.resolve(dataCache[file]);
     }
@@ -60,7 +62,7 @@ async function loadData() {
     await Promise.all(promises);
     return true;
   } catch (error) {
-    console.error('Error loading one or more Irma data files. Check file paths:', error);
+    console.error('Error loading one or more Harvey data files. Check file paths:', error);
     return false;
   }
 }
@@ -71,7 +73,7 @@ function nextTimestamp() {
     const slider = d3.select('#timestamp-slider').node();
     let nextIndex = parseInt(slider.value) + 1;
 
-    if (nextIndex >= IRMA_FILES.length) {
+    if (nextIndex >= HARVEY_FILES.length) {
         stopAnimation();
         return;
     }
@@ -84,7 +86,7 @@ function startAnimation() {
     if (timer) return; 
 
     const slider = d3.select('#timestamp-slider').node();
-    if (parseInt(slider.value) === IRMA_FILES.length - 1) {
+    if (parseInt(slider.value) === HARVEY_FILES.length - 1) {
         resetAnimation();
     }
 
@@ -111,7 +113,7 @@ function createViewerUI() {
   const container = d3.select(viewerId);
 
   container.html('');
-  container.append('h3').text('Hurricane Irma Progression Heatmap');
+  container.append('h3').text('Hurricane Harvey Progression Heatmap');
   timestampLabel = container.append('div').attr('id', 'timestamp-label');
 
   // 1. Control Buttons
@@ -140,7 +142,7 @@ function createViewerUI() {
     .attr('type', 'range')
     .attr('id', 'timestamp-slider')
     .attr('min', 0)
-    .attr('max', IRMA_FILES.length - 1)
+    .attr('max', HARVEY_FILES.length - 1)
     .attr('value', 0)
     .attr('step', 1)
     .on('input', function() {
@@ -152,7 +154,7 @@ function createViewerUI() {
   canvas = container.append('canvas')
     .attr('width', width)
     .attr('height', height)
-    .attr('id', 'irma-viewer-canvas')
+    .attr('id', 'harvey-viewer-canvas')
     .node();
   
   ctx = canvas.getContext('2d');
@@ -177,8 +179,11 @@ function createViewerUI() {
 function updateViewer(fileIndex) {
   if (!viewerReady) return;
 
-  const fileName = IRMA_FILES[fileIndex];
+  const fileName = HARVEY_FILES[fileIndex];
   const data = dataCache[fileName]; 
+
+  // Default display label
+  let displayTime = '(unknown)';
 
   if (!data || data.length === 0) {
       timestampLabel.text(`Timestamp: ${fileName.replace('.csv', '')} - (No Data Available)`);
@@ -186,15 +191,15 @@ function updateViewer(fileIndex) {
       return;
   }
   
-  const baseName = fileName.replace('_sampled.csv', '').replace('irma_', '');
-  const YYYY = baseName.substring(0, 4);
-  const MM = baseName.substring(4, 6);
-  const DD = baseName.substring(6, 8);
-  const HH = baseName.substring(9, 11); 
+  const match = fileName.match(/harvey_(\d{4})(\d{2})(\d{2})_(\d{2})Z/);
+  if (match) {
+    const [_, YYYY, MM, DD, HH] = match;
+    displayTime = `${MM}/${DD}/${YYYY} ${HH}:00`;
+  }
 
-  const displayTime = `${MM}/${DD}/${YYYY} ${HH}:00`;
+  // Update UI with the resolved time label once
+  timestampLabel.text(`Timestamp: ${displayTime}`);
 
-  
   // Clear Canvas 
   ctx.clearRect(0, 0, width, height);
   
@@ -209,16 +214,14 @@ function updateViewer(fileIndex) {
     ctx.fillStyle = colorScale(d.CMI);
     ctx.fillRect(x - POINT_SIZE / 2, y - POINT_SIZE / 2, POINT_SIZE, POINT_SIZE);
   }
-
-  timestampLabel.text(`Timestamp: ${displayTime}`);
 }
 
-export async function initializeIrmaViewer() {
+export async function initializeHarveyViewer() {
   const loadSuccess = await loadData();
 
   if (loadSuccess) {
     createViewerUI();
   } else {
-    d3.select(viewerId).html('<p>Error: Could not load all Hurricane Irma data files. Check file paths and accessibility.</p>');
+    d3.select(viewerId).html('<p>Error: Could not load all Hurricane Harvey data files. Check file paths and accessibility.</p>');
   }
 }
