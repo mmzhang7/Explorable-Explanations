@@ -37,12 +37,9 @@ const storms = [
   }
 ];
 
-const projection = d3.geoNaturalEarth1()
-  .center([-82, 27])
-  .scale(width * 1.3)
-  .translate([width / 2, height / 2]);
-
+const projection = d3.geoMercator();
 const pathGenerator = d3.geoPath(projection);
+
 
 const svg = container.append('svg')
   .attr('viewBox', `0 0 ${width} ${height}`)
@@ -94,11 +91,10 @@ function zoomToStorm(d) {
         .translate(-x, -y)
     )
     .on('end', () => {
-      // After zooming is complete, check if it's Hurricane Ida
       if (d.id === 'ida') {
         d3.select('#ida-viewer').classed('hidden', false);
-        d3.select('#globe').style('opacity', 0.5); // Dim the globe
-        initializeIdaViewer(); // Call the new viewer function
+        d3.select('#globe').style('opacity', 0.5);
+        initializeIdaViewer();
       }
       if (d.id === 'harvey') {
         d3.select('#harvey-viewer').classed('hidden', false);
@@ -135,7 +131,6 @@ d3.select('#reset-view').on('click', resetZoom);
 const borderGroup = mapGroup.append('g').attr('class', 'borders');
 const labelGroup  = mapGroup.append('g').attr('class', 'labels');
 
-// Countries we want outlined + labeled
 const TARGET_COUNTRIES = new Set([
   "Mexico",
   "Cuba",
@@ -146,7 +141,6 @@ const TARGET_COUNTRIES = new Set([
   "Puerto Rico"
 ]);
 
-// US States we want outlined + labeled
 const TARGET_STATES = new Set([
   "Florida",
   "Texas",
@@ -182,7 +176,6 @@ Promise.all([
   const allCountries = topojson.feature(world, world.objects.countries).features;
   const allStates = topojson.feature(us, us.objects.states).features;
 
-  // Filter only the selected ones
   const filteredCountries = allCountries.filter(
     d => TARGET_COUNTRIES.has(d.properties.name)
   );
@@ -191,7 +184,13 @@ Promise.all([
     d => TARGET_STATES.has(d.properties.name)
   );
 
-  // Draw world land (no borders)
+  const regionCollection = {
+    type: "FeatureCollection",
+    features: [...filteredCountries, ...filteredStates]
+  };
+
+  projection.fitExtent([[20, 20], [width - 20, height - 20]], regionCollection);
+
   landGroup.selectAll('path')
     .data(allCountries)
     .enter()
@@ -199,7 +198,6 @@ Promise.all([
     .attr('class', 'country')
     .attr('d', pathGenerator);
 
-  // OUTLINES for only selected countries
   borderGroup.selectAll('.country-outline')
     .data(filteredCountries)
     .enter()
@@ -207,7 +205,6 @@ Promise.all([
     .attr('class', 'country-outline')
     .attr('d', pathGenerator);
 
-  // OUTLINES for only selected states
   borderGroup.selectAll('.state-outline')
     .data(filteredStates)
     .enter()
@@ -215,7 +212,6 @@ Promise.all([
     .attr('class', 'state-outline')
     .attr('d', pathGenerator);
 
-  // LABELS for selected countries
   labelGroup.selectAll('.country-label')
     .data(filteredCountries)
     .enter()
@@ -225,10 +221,8 @@ Promise.all([
     .attr('dx', d => LABEL_OFFSETS[d.properties.name]?.dx || 0)
     .attr('dy', d => LABEL_OFFSETS[d.properties.name]?.dy || 0)
     .text(d => d.properties.name)
-    .attr('text-anchor', 'middle')
-    
+    .attr('text-anchor', 'middle');
 
-  // LABELS for selected states
   labelGroup.selectAll('.state-label')
     .data(filteredStates)
     .enter()
@@ -238,10 +232,8 @@ Promise.all([
     .attr('dx', d => LABEL_OFFSETS[d.properties.name]?.dx || 0)
     .attr('dy', d => LABEL_OFFSETS[d.properties.name]?.dy || 0)
     .text(d => d.properties.name)
-    .attr('text-anchor', 'middle')
-    
+    .attr('text-anchor', 'middle');
 
-  // --- Storm markers as before ---
   stormGroup.selectAll('circle')
     .data(storms)
     .enter()
