@@ -1,13 +1,12 @@
 import * as d3 from 'd3';
 
-let destructiveSvg, trendSvg;
-let currentView = 'damage'; // 'damage' or 'trend'
+let trendSvg;
 
 export function initializeDestructiveTrends() {
     console.log('Initializing Destructive & Trends section...');
     
     const container = d3.select('#destructive-visualization');
-    container.html('<div class="graph-placeholder">Loading hurricane damage and trend visualizations...</div>');
+    container.html('<div class="graph-placeholder">Loading hurricane trend visualization...</div>');
 }
 
 export function onEnterDestructiveTrends() {
@@ -20,54 +19,23 @@ export function onEnterDestructiveTrends() {
     
     container.html('');
     
-    // Create toggle buttons (styles defined in CSS)
-    const toggleContainer = container.append('div')
-        .attr('class', 'view-toggle');
-    
-    toggleContainer.append('button')
-        .attr('id', 'damage-view-btn')
-        .attr('class', 'toggle-btn active')
-        .text('Damage by Category')
-        // Set specific active color (retained in JS because it matches the chart color)
-        .style('background', '#e74c3c') 
-        .on('click', () => switchView('damage'));
-    
-    toggleContainer.append('button')
-        .attr('id', 'trend-view-btn')
-        .attr('class', 'toggle-btn')
-        .text('Increasing Trends')
-        // Set default non-active color and specific active color
-        .style('background', '#95a5a6') 
-        .on('click', () => switchView('trend'));
-    
     // Create visualization container
     const vizContainer = container.append('div')
         .attr('id', 'destructive-viz-container');
     
-    // Create both SVGs (styles defined in CSS/HTML for container)
-    destructiveSvg = vizContainer.append('svg')
-        .attr('id', 'damage-svg')
+    // Create trend SVG
+    trendSvg = vizContainer.append('svg')
+        .attr('id', 'trend-svg')
         .attr('width', width)
         .attr('height', height)
         .attr('viewBox', `0 0 ${width} ${height}`)
         .style('display', 'block')
         .style('visibility', 'visible');
     
-    trendSvg = vizContainer.append('svg')
-        .attr('id', 'trend-svg')
-        .attr('width', width)
-        .attr('height', height)
-        .attr('viewBox', `0 0 ${width} ${height}`)
-        .style('display', 'none')
-        .style('visibility', 'hidden');
-    
-    // Create damage visualization
-    createDamageVisualization(width, height);
-    
     // Create trend visualization
     createTrendVisualization(width, height);
     
-    // Add combined insights (content/structure retained in JS)
+    // Add key insights
     const insights = container.append('div')
         .attr('class', 'combined-insights');
     
@@ -75,206 +43,15 @@ export function onEnterDestructiveTrends() {
         <h4>Key Insights</h4>
         <div>
             <div>
-                <h5>Damage Escalation</h5>
-                <p>Damage increases exponentially with category. A **Category 5** hurricane causes far more damage than Category 1.</p>
-            </div>
-            <div>
-                <h5>Trend Analysis</h5>
+                <h5>Tropical Storms</h5>
                 <p>In the last 100 years, the number of tropical storms has increased by <b>272%</b></p>
             </div>
             <div>
-                <h5>Climate Connection</h5>
-                <p>Warmer oceans (+1°C) increase hurricane rainfall by **7%** and intensity by **3-5%**.</p>
+                <h5>Major Hurricanes</h5>
+                <p>Since 1990, the number of major hurricanes have jumped up significantly, and so far from 2021-2024 we have already seen 14 major hurricanes with the number quickly rising.</p>
             </div>
         </div>
     `);
-}
-
-function switchView(view) {
-    currentView = view;
-    
-    // Update button states (using classes defined in CSS for common styles)
-    d3.select('#damage-view-btn')
-        .classed('active', view === 'damage')
-        // Use specific colors for active state
-        .style('background', view === 'damage' ? '#e74c3c' : '#95a5a6'); 
-    
-    d3.select('#trend-view-btn')
-        .classed('active', view === 'trend')
-        // Use specific colors for active state
-        .style('background', view === 'trend' ? '#3498db' : '#95a5a6');
-    
-    // Show/hide visualizations
-    if (view === 'damage') {
-        destructiveSvg.style('display', 'block').style('visibility', 'visible');
-        trendSvg.style('display', 'none').style('visibility', 'hidden');
-    } else {
-        destructiveSvg.style('display', 'none').style('visibility', 'hidden');
-        trendSvg.style('display', 'block').style('visibility', 'visible');
-    }
-}
-
-function createDamageVisualization(width, height) {
-    // Data for damage by hurricane category
-    const categories = [
-        { category: 'Cat 1', winds: '74-95 mph', damage: 'Minimal', cost: 1, color: '#4CAF50' },
-        { category: 'Cat 2', winds: '96-110 mph', damage: 'Moderate', cost: 5, color: '#FFC107' },
-        { category: 'Cat 3', winds: '111-129 mph', damage: 'Extensive', cost: 20, color: '#FF9800' },
-        { category: 'Cat 4', winds: '130-156 mph', damage: 'Extreme', cost: 50, color: '#F44336' },
-        { category: 'Cat 5', winds: '157+ mph', damage: 'Catastrophic', cost: 100, color: '#B71C1C' }
-    ];
-    
-    const margin = { top: 40, right: 30, bottom: 80, left: 80 };
-    const innerWidth = width - margin.left - margin.right;
-    const innerHeight = height - margin.top - margin.bottom;
-    
-    const x = d3.scaleBand()
-        .domain(categories.map(d => d.category))
-        .range([0, innerWidth])
-        .padding(0.3);
-    
-    const y = d3.scaleLinear()
-        .domain([0, d3.max(categories, d => d.cost)])
-        .range([innerHeight, 0])
-        .nice();
-    
-    const g = destructiveSvg.append('g')
-        .attr('transform', `translate(${margin.left},${margin.top})`);
-    
-    // Add gridlines (using CSS class 'grid')
-    g.append('g')
-        .attr('class', 'grid')
-        .call(d3.axisLeft(y)
-            .ticks(6)
-            .tickSize(-innerWidth)
-            .tickFormat(''));
-    
-    // Create bars
-    g.selectAll('.bar')
-        .data(categories)
-        .enter()
-        .append('rect')
-        .attr('class', 'bar')
-        .attr('x', d => x(d.category))
-        .attr('y', d => y(d.cost))
-        .attr('width', x.bandwidth())
-        .attr('height', d => innerHeight - y(d.cost))
-        .attr('fill', d => d.color)
-        .attr('rx', 3)
-        .attr('ry', 3)
-        .attr('opacity', 0.8) // Set default opacity
-        .on('mouseover', function(event, d) {
-            showDamageTooltip(event, d);
-            d3.select(this).attr('opacity', 1.0);
-        })
-        .on('mouseout', function(event, d) {
-            hideTooltip();
-            d3.select(this).attr('opacity', 0.8);
-        });
-    
-    // Add value labels
-    g.selectAll('.bar-label')
-        .data(categories)
-        .enter()
-        .append('text')
-        .attr('class', 'bar-label')
-        .attr('x', d => x(d.category) + x.bandwidth() / 2)
-        .attr('y', d => y(d.cost) - 5)
-        .attr('text-anchor', 'middle')
-        .style('font-size', '12px')
-        .style('font-weight', 'bold')
-        .style('fill', '#2c3e50')
-        .text(d => `$${d.cost}B`);
-    
-    // Add axes
-    g.append('g')
-        .attr('class', 'x-axis')
-        .attr('transform', `translate(0,${innerHeight})`)
-        .call(d3.axisBottom(x));
-    
-    g.append('g')
-        .attr('class', 'y-axis')
-        .call(d3.axisLeft(y).tickFormat(d => `$${d}B`));
-    
-    // Add axis labels
-    g.append('text')
-        .attr('class', 'x-label')
-        .attr('x', innerWidth / 2)
-        .attr('y', innerHeight + margin.bottom - 10)
-        .attr('text-anchor', 'middle')
-        .style('font-size', '14px')
-        .text('Hurricane Category');
-    
-    g.append('text')
-        .attr('class', 'y-label')
-        .attr('transform', 'rotate(-90)')
-        .attr('x', -innerHeight / 2)
-        .attr('y', -margin.left + 20)
-        .attr('text-anchor', 'middle')
-        .style('font-size', '14px')
-        .text('Estimated Damage (Billions USD)');
-    
-    // Add chart title
-    g.append('text')
-        .attr('class', 'chart-title')
-        .attr('x', innerWidth / 2)
-        .attr('y', -10)
-        .attr('text-anchor', 'middle')
-        .style('font-size', '16px')
-        .style('font-weight', 'bold')
-        .text('Exponential Damage Increase by Category');
-    
-    // Add damage mechanisms visualization
-    const damageTypes = destructiveSvg.append('g')
-        .attr('transform', `translate(${width - 250}, 50)`);
-    
-    const mechanisms = [
-        { type: 'Wind', icon: '💨', percent: 40, color: '#FF9800' },
-        { type: 'Storm Surge', icon: '🌊', percent: 30, color: '#2196F3' },
-        { type: 'Rainfall', icon: '🌧️', percent: 20, color: '#4CAF50' },
-        { type: 'Tornadoes', icon: '🌪️', percent: 10, color: '#9C27B0' }
-    ];
-    
-    mechanisms.forEach((mechanism, i) => {
-        const yPos = i * 50;
-        
-        damageTypes.append('text')
-            .attr('x', 0)
-            .attr('y', yPos)
-            .style('font-size', '24px')
-            .text(mechanism.icon);
-        
-        damageTypes.append('rect')
-            .attr('x', 30)
-            .attr('y', yPos - 10)
-            .attr('width', mechanism.percent * 2)
-            .attr('height', 20)
-            .attr('fill', mechanism.color)
-            .attr('rx', 3)
-            .attr('ry', 3);
-        
-        damageTypes.append('text')
-            .attr('x', 40 + mechanism.percent * 2)
-            .attr('y', yPos + 5)
-            .style('font-size', '12px')
-            .style('font-weight', 'bold')
-            .text(`${mechanism.percent}%`);
-        
-        damageTypes.append('text')
-            .attr('x', 30)
-            .attr('y', yPos + 30)
-            .style('font-size', '11px')
-            .style('fill', '#666')
-            .text(mechanism.type);
-    });
-    
-    damageTypes.append('text')
-        .attr('x', 0)
-        .attr('y', -20)
-        .style('font-size', '12px')
-        .style('font-weight', 'bold')
-        .style('fill', '#2c3e50')
-        .text('Damage Breakdown:');
 }
 
 function createTrendVisualization(width, height) {
@@ -507,78 +284,12 @@ function createTrendVisualization(width, height) {
     });
 }
 
-function showDamageTooltip(event, data) {
-    const tooltip = d3.select('#destructive-visualization')
-        .append('div')
-        .attr('class', 'tooltip') // Use CSS class
-        .style('position', 'absolute')
-        .style('left', (event.pageX + 10) + 'px')
-        .style('top', (event.pageY - 10) + 'px')
-        .style('opacity', 0);
-    
-    const examples = {
-        'Cat 1': 'Humberto (2007): $50M damage',
-        'Cat 2': 'Frances (2004): $9B damage',
-        // Note: Katrina and Harvey are often grouped as $125B+ (2017/2022 adjusted)
-        'Cat 3': 'Katrina (2005): $125B damage', 
-        'Cat 4': 'Harvey (2017): $125B damage',
-        'Cat 5': 'Andrew (1992): $27B damage' // Note: High wind, but localized vs flooding
-    };
-    
-    tooltip.html(`
-        <strong>${data.category}: ${data.damage} Damage</strong><br>
-        Winds: ${data.winds}<br>
-        Avg. Damage: $${data.cost}B (Relative Scale)<br>
-        Example: ${examples[data.category]}
-    `)
-    .transition()
-    .duration(200)
-    .style('opacity', 1);
-}
-
-function hideTooltip() {
-    d3.selectAll('.tooltip')
-        .transition()
-        .duration(200)
-        .style('opacity', 0)
-        .remove();
-}
-
 export function onExitDestructiveTrends() {
     console.log('Exiting Destructive & Trends section');
-    hideTooltip();
 }
 
 export function onProgressDestructiveTrends(progress) {
-    if (currentView === 'damage' && destructiveSvg && progress > 0.2) {
-        // Animate damage bars
-        destructiveSvg.selectAll('.bar')
-            .transition()
-            .duration(1000)
-            .delay((d, i) => i * 100)
-            .attr('y', d => {
-                const innerHeight = 420; 
-                const topMargin = 40; 
-                const yRangeMax = innerHeight + topMargin;
-                const yRangeMin = topMargin;
-                
-                const yScale = d3.scaleLinear()
-                    .domain([0, 100])
-                    .range([yRangeMax, yRangeMin]); 
-                return yScale(d.cost * progress);
-            })
-            .attr('height', d => {
-                const innerHeight = 420; 
-                const topMargin = 40; 
-                const yRangeMax = innerHeight + topMargin;
-                const yRangeMin = topMargin;
-                
-                const yScale = d3.scaleLinear()
-                    .domain([0, 100])
-                    .range([yRangeMax, yRangeMin]); 
-                return yRangeMax - yScale(d.cost * progress);
-            });
-    } else if (currentView === 'trend' && trendSvg && progress > 0.3) {
+    if (trendSvg && progress > 0.3) {
         const tropicalStormsLine = trendSvg.select('.line-tropical-storms').node();
         const hurricanesLine = trendSvg.select('.line-hurricanes').node();
         const majorHurricanesLine = trendSvg.select('.line-major-hurricanes').node();
