@@ -6,7 +6,7 @@ export function initializeHurricaneSandy() {
     const container = d3.select('#sandy-visualization');
     container.html('<div class="graph-placeholder">Loading Hurricane Sandy key facts...</div>');
 }
-
+ 
 export function onEnterHurricaneSandy() {
     console.log('Entering Hurricane Sandy section');
     
