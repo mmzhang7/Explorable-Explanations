@@ -13,7 +13,6 @@ export function onEnterHurricaneSandy() {
     const container = d3.select('#sandy-visualization');
     container.html('');
     
-    // Create facts grid directly in container
     const factsGrid = container.append('div')
         .attr('class', 'sandy-facts-grid');
     
