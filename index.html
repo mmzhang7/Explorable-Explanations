@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hurricane Scrollarama</title>
-    
+
     <!-- Main CSS -->
     <link rel="stylesheet" href="css/main.css">
-    
+
     <!-- Scrollama library -->
     <script type="importmap">
     {
@@ -17,37 +18,50 @@
         }
     }
     </script>
-    
+
     <!-- Main JS module -->
     <script type="module" src="js/global.js"></script>
 </head>
+
 <body>
     <!-- Header -->
     <header>
         <h1>Understanding Hurricanes</h1>
         <p>A scroll-driven exploration of hurricane science, impacts, and preparedness</p>
     </header>
-    
+
     <!-- Main scrollytelling container -->
     <main id="scrollarama-container">
         <!-- Hook Section -->
         <section id="hook-section" class="scroll-section">
-            <div class="text-content">
-                <h2>Hook: Nature's Most Powerful Storms</h2>
-                <p>Every year, these massive rotating storms form over warm ocean waters, gathering energy and strength before unleashing their fury on coastal communities.</p>
+        <div class="container">
+            <h1>Devastating Damages: Damages in Millions of USD of Top Ten Most Costly Hurricanes (2015-2025)</h1>
+            <div id="hook-visualization" class="visualization-container">
             </div>
-            <div id="hook-visualization" class="visualization"></div>
-        </section>
-        
+            <div class="narrative">
+                <h2>The Cost of Destruction</h2>
+                <p>Hurricanes are among the most destructive natural disasters, with property damage often reaching billions of dollars. This visualization shows the top 10 costliest hurricanes in the US over the past 10 years, focusing on property damage alone.</p>
+                <p><strong>Hover over bars</strong> to see detailed damage figures and fatality counts.</p>
+            </div>
+        </div>
+    </section>
         <!-- What is a Hurricane Section -->
         <section id="what-is-hurricane-section" class="scroll-section">
-            <div class="text-content">
-                <h2>What is a Hurricane?</h2>
-                <p>A hurricane is a rotating low-pressure weather system with sustained winds of at least 74 mph.</p>
-            </div>
-            <div id="anatomy-visualization" class="visualization"></div>
-        </section>
-        
+    <div class="text-content">
+        <h2>What is a Hurricane?</h2>
+        <p>A hurricane is a rotating low-pressure weather system with sustained winds of at least 74 mph.</p>
+        <p>Requirements for formation:</p>
+        <ul>
+            <li>Warm ocean surface ≥ 26.5°C</li>
+            <li>Low atmospheric pressure</li>
+            <li>Low vertical wind shear</li>
+            <li>Coriolis effect rotation</li>
+        </ul>
+    </div>
+    <div id="anatomy-visualization" class="visualization"></div>
+</section>
+<div id="tooltip"></div>
+
         <!-- Build Your Own Hurricane Section -->
         <section id="build-hurricane-section" class="scroll-section">
             <div class="text-content">
@@ -56,7 +70,7 @@
             </div>
             <div id="build-hurricane-visualization" class="visualization"></div>
         </section>
-        
+
         <!-- Click on Different Hurricanes Section -->
         <section id="click-hurricanes-section" class="scroll-section">
             <div class="text-content">
@@ -65,7 +79,7 @@
             </div>
             <div id="cities-visualization" class="visualization"></div>
         </section>
-        
+
         <!-- Destructive Power & Trends Section -->
         <section id="destructive-trends-section" class="scroll-section">
             <div class="text-content">
@@ -74,7 +88,7 @@
             </div>
             <div id="destructive-visualization" class="visualization"></div>
         </section>
-        
+
         <!-- Preparedness & Action Section -->
         <section id="preparedness-action-section" class="scroll-section">
             <div class="text-content">
@@ -84,8 +98,9 @@
             <div id="action-visualization" class="visualization"></div>
         </section>
     </main>
-    
+
     <!-- Progress indicator -->
     <div id="progress-indicator"></div>
 </body>
+
 </html>

@@ -1,0 +1,152 @@
+{
+  "hurricane": "Milton",
+  "year": 2024,
+  "peak_category": 5,
+  "total_frames": 13,
+  "interval_minutes": 30,
+  "frames": [
+    {
+      "frame": 0,
+      "hour": 12,
+      "minute": 0,
+      "filename": "milton_cat5_00.csv",
+      "time_str": "12:00",
+      "category": 4,
+      "wind_mph": 140,
+      "center_lon": -85.19359354575934,
+      "center_lat": 23.44847080017773
+    },
+    {
+      "frame": 1,
+      "hour": 12,
+      "minute": 30,
+      "filename": "milton_cat5_01.csv",
+      "time_str": "12:30",
+      "category": 4,
+      "wind_mph": 140,
+      "center_lon": -85.5018509437959,
+      "center_lat": 23.389315769748123
+    },
+    {
+      "frame": 2,
+      "hour": 13,
+      "minute": 0,
+      "filename": "milton_cat5_02.csv",
+      "time_str": "13:00",
+      "category": 4,
+      "wind_mph": 140,
+      "center_lon": -85.28102182312078,
+      "center_lat": 23.44109615917361
+    },
+    {
+      "frame": 3,
+      "hour": 13,
+      "minute": 30,
+      "filename": "milton_cat5_03.csv",
+      "time_str": "13:30",
+      "category": 4,
+      "wind_mph": 140,
+      "center_lon": -85.30199057736951,
+      "center_lat": 23.339451716214548
+    },
+    {
+      "frame": 4,
+      "hour": 14,
+      "minute": 0,
+      "filename": "milton_cat5_04.csv",
+      "time_str": "14:00",
+      "category": 4,
+      "wind_mph": 140,
+      "center_lon": -85.34983086012292,
+      "center_lat": 23.41782501856442
+    },
+    {
+      "frame": 5,
+      "hour": 14,
+      "minute": 30,
+      "filename": "milton_cat5_05.csv",
+      "time_str": "14:30",
+      "category": 4,
+      "wind_mph": 140,
+      "center_lon": -85.35020868399916,
+      "center_lat": 23.53177621264639
+    },
+    {
+      "frame": 6,
+      "hour": 15,
+      "minute": 0,
+      "filename": "milton_cat5_06.csv",
+      "time_str": "15:00",
+      "category": 4,
+      "wind_mph": 140,
+      "center_lon": -85.71438978852318,
+      "center_lat": 23.46798092539816
+    },
+    {
+      "frame": 7,
+      "hour": 15,
+      "minute": 30,
+      "filename": "milton_cat5_07.csv",
+      "time_str": "15:30",
+      "category": 4,
+      "wind_mph": 140,
+      "center_lon": -85.80260633589107,
+      "center_lat": 23.50592991474267
+    },
+    {
+      "frame": 8,
+      "hour": 16,
+      "minute": 0,
+      "filename": "milton_cat5_08.csv",
+      "time_str": "16:00",
+      "category": 4,
+      "wind_mph": 140,
+      "center_lon": -85.76669072475605,
+      "center_lat": 23.455491072865986
+    },
+    {
+      "frame": 9,
+      "hour": 16,
+      "minute": 30,
+      "filename": "milton_cat5_09.csv",
+      "time_str": "16:30",
+      "category": 4,
+      "wind_mph": 140,
+      "center_lon": -85.83028581996076,
+      "center_lat": 23.57353420435289
+    },
+    {
+      "frame": 10,
+      "hour": 17,
+      "minute": 0,
+      "filename": "milton_cat5_10.csv",
+      "time_str": "17:00",
+      "category": 4,
+      "wind_mph": 140,
+      "center_lon": -85.88900754560983,
+      "center_lat": 23.67993237101981
+    },
+    {
+      "frame": 11,
+      "hour": 17,
+      "minute": 30,
+      "filename": "milton_cat5_11.csv",
+      "time_str": "17:30",
+      "category": 5,
+      "wind_mph": 160,
+      "center_lon": -85.75128052220127,
+      "center_lat": 23.77589083363423
+    },
+    {
+      "frame": 12,
+      "hour": 18,
+      "minute": 0,
+      "filename": "milton_cat5_12.csv",
+      "time_str": "18:00",
+      "category": 4,
+      "wind_mph": 140,
+      "center_lon": -85.91523035036471,
+      "center_lat": 23.739651446884363
+    }
+  ]
+}
