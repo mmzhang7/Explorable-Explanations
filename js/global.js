@@ -186,9 +186,9 @@ function setupKeyboardNavigation() {
         } else if (event.key === 'ArrowUp' || event.key === 'PageUp') {
             event.preventDefault();
             scrollToSection(currentSection - 1);
-        } else if (event.key >= '1' && event.key <= '6') {
-            event.preventDefault();
-            scrollToSection(parseInt(event.key) - 1);
+        // } else if (event.key >= '1' && event.key <= '6') {
+        //     event.preventDefault();
+        //     scrollToSection(parseInt(event.key) - 1);
         } else if (event.key === 'Home') {
             event.preventDefault();
             scrollToSection(0);
