@@ -25,19 +25,19 @@ const IDA_FILES = [
   './data/ida_20210830_06Z_sampled.csv'
 ];
 const IDA_TIMESTAMPS = [
-  { file: './data/ida_20210827_18Z_sampled.csv', lat: 21.5076, lon: -82.6180, color: 'yellow' },
-  { file: './data/ida_20210827_23Z_sampled.csv', lat: 22.4274, lon: -83.2202, color: 'yellow' },
-  { file: './data/ida_20210828_00Z_sampled.csv', lat: 22.6019, lon: -83.5154, color: 'yellow' },
-  { file: './data/ida_20210828_06Z_sampled.csv', lat: 23.5036, lon: -84.6960, color: 'yellow' },
-  { file: './data/ida_20210828_12Z_sampled.csv', lat: 24.4314, lon: -85.7114, color: 'yellow' },
-  { file: './data/ida_20210828_18Z_sampled.csv', lat: 25.6026, lon: -86.6013, color: 'yellow' },
-  { file: './data/ida_20210829_00Z_sampled.csv', lat: 26.7153, lon: -87.6048, color: 'orange' },
-  { file: './data/ida_20210829_06Z_sampled.csv', lat: 27.6082, lon: -88.7029, color: 'magenta' },
-  { file: './data/ida_20210829_12Z_sampled.csv', lat: 28.5055, lon: -89.6031, color: 'magenta' },
-  { file: './data/ida_20210829_16Z_sampled.csv', lat: 29.0850, lon: -90.2170, color: 'magenta' },
-  { file: './data/ida_20210829_18Z_sampled.csv', lat: 29.2293, lon: -90.4059, color: 'magenta' },
-  { file: './data/ida_20210830_00Z_sampled.csv', lat: 29.9071, lon: -90.6185, color: 'red' },
-  { file: './data/ida_20210830_06Z_sampled.csv', lat: 30.6006, lon: -90.8074, color: 'yellow' }
+  { file: './data/ida_20210827_18Z_sampled.csv', lat: 21.5076, lon: -82.6180, color: '#ffea00' },
+  { file: './data/ida_20210827_23Z_sampled.csv', lat: 22.4274, lon: -83.2202, color: '#ffea00' },
+  { file: './data/ida_20210828_00Z_sampled.csv', lat: 22.6019, lon: -83.5154, color: '#ffea00' },
+  { file: './data/ida_20210828_06Z_sampled.csv', lat: 23.5036, lon: -84.6960, color: '#ffea00' },
+  { file: './data/ida_20210828_12Z_sampled.csv', lat: 24.4314, lon: -85.7114, color: '#ffea00' },
+  { file: './data/ida_20210828_18Z_sampled.csv', lat: 25.6026, lon: -86.6013, color: '#ffea00' },
+  { file: './data/ida_20210829_00Z_sampled.csv', lat: 26.7153, lon: -87.6048, color: '#ff8000' },
+  { file: './data/ida_20210829_06Z_sampled.csv', lat: 27.6082, lon: -88.7029, color: '#ff00cc' },
+  { file: './data/ida_20210829_12Z_sampled.csv', lat: 28.5055, lon: -89.6031, color: '#ff00cc' },
+  { file: './data/ida_20210829_16Z_sampled.csv', lat: 29.0850, lon: -90.2170, color: '#ff00cc' },
+  { file: './data/ida_20210829_18Z_sampled.csv', lat: 29.2293, lon: -90.4059, color: '#ff00cc' },
+  { file: './data/ida_20210830_00Z_sampled.csv', lat: 29.9071, lon: -90.6185, color: '#ff0033' },
+  { file: './data/ida_20210830_06Z_sampled.csv', lat: 30.6006, lon: -90.8074, color: '#ffea00' }
 ];
 
 const dataCache = {};

@@ -26,22 +26,22 @@ const IAN_FILES = [
 ];
 const IAN_TIMESTAMPS = [
   
-  { file: './data/ian_20220927_06Z_sampled.csv', lat: 21.7813, lon: -83.4997, color: 'red' },
-  { file: './data/ian_20220927_08Z_sampled.csv', lat: 22.2059, lon: -83.6443, color: 'red' },
-  { file: './data/ian_20220927_12Z_sampled.csv', lat: 22.5847, lon: -83.5720, color: 'red' },
-  { file: './data/ian_20220927_18Z_sampled.csv', lat: 23.5382, lon: -83.3310, color: 'red' },
+  { file: './data/ian_20220927_06Z_sampled.csv', lat: 21.7813, lon: -83.4997, color: '#ff0033' },
+  { file: './data/ian_20220927_08Z_sampled.csv', lat: 22.2059, lon: -83.6443, color: '#ff0033' },
+  { file: './data/ian_20220927_12Z_sampled.csv', lat: 22.5847, lon: -83.5720, color: '#ff0033' },
+  { file: './data/ian_20220927_18Z_sampled.csv', lat: 23.5382, lon: -83.3310, color: '#ff0033' },
 
-  { file: './data/ian_20220928_00Z_sampled.csv', lat: 24.3312, lon: -83.1141, color: 'red' },
-  { file: './data/ian_20220928_02Z_sampled.csv', lat: 24.5944, lon: -83.0659, color: 'red' },
-  { file: './data/ian_20220928_06Z_sampled.csv', lat: 25.1629, lon: -83.0418, color: 'magenta' },
-  { file: './data/ian_20220928_12Z_sampled.csv', lat: 25.9456, lon: -82.9454, color: 'purple' },
-  { file: './data/ian_20220928_18Z_sampled.csv', lat: 26.5724, lon: -82.7044, color: 'magenta' },
-  { file: './data/ian_20220928_19Z_sampled.csv', lat: 26.7016, lon: -82.5116, color: 'magenta' },
-  { file: './data/ian_20220928_20Z_sampled.csv', lat: 26.8092, lon: -82.4152, color: 'magenta' },
+  { file: './data/ian_20220928_00Z_sampled.csv', lat: 24.3312, lon: -83.1141, color: '#ff0033' },
+  { file: './data/ian_20220928_02Z_sampled.csv', lat: 24.5944, lon: -83.0659, color: '#ff0033' },
+  { file: './data/ian_20220928_06Z_sampled.csv', lat: 25.1629, lon: -83.0418, color: '#ff00cc' },
+  { file: './data/ian_20220928_12Z_sampled.csv', lat: 25.9456, lon: -82.9454, color: '#9d00ff' },
+  { file: './data/ian_20220928_18Z_sampled.csv', lat: 26.5724, lon: -82.7044, color: '#ff00cc' },
+  { file: './data/ian_20220928_19Z_sampled.csv', lat: 26.7016, lon: -82.5116, color: '#ff00cc' },
+  { file: './data/ian_20220928_20Z_sampled.csv', lat: 26.8092, lon: -82.4152, color: '#ff00cc' },
 
-  { file: './data/ian_20220929_00Z_sampled.csv', lat: 27.1529, lon: -82.2224, color: 'red' },
-  { file: './data/ian_20220929_06Z_sampled.csv', lat: 27.6877, lon: -81.0404, color: 'yellow' },
-  { file: './data/ian_20220929_12Z_sampled.csv', lat: 28.3912, lon: -80.5218, color: 'green' }
+  { file: './data/ian_20220929_00Z_sampled.csv', lat: 27.1529, lon: -82.2224, color: '#ff0033' },
+  { file: './data/ian_20220929_06Z_sampled.csv', lat: 27.6877, lon: -81.0404, color: '#ffea00' },
+  { file: './data/ian_20220929_12Z_sampled.csv', lat: 28.3912, lon: -80.5218, color: '#00e676' }
 ];
 
 const dataCache = {};

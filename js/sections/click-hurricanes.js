@@ -9,7 +9,6 @@ import { initializeIrmaViewer, IRMA_TIMESTAMPS, setIrmaTimestamp } from '../irma
 let svg, mapGroup, landGroup, stormGroup;
 let projection, pathGenerator;
 let zoom;
-let originalStormPositions = [];
 let isGlobeInitialized = false;
 
 let width = 800;
@@ -57,47 +56,43 @@ const irmaBounds = d3.geoBounds({
 });
 
 const hurricaneLegend = [
-    { color: '#purple', label: 'Category 5', value: '157+ mph' },
-    { color: '#magenta', label: 'Category 4', value: '130-156 mph' },
-    { color: '#red', label: 'Category 3', value: '111-129 mph' },
-    { color: '#orange', label: 'Category 2', value: '96-110 mph' },
-    { color: '#yellow', label: 'Category 1', value: '74-95 mph' },
-    { color: '#green', label: 'Tropical Storm', value: '39-73 mph' },
+    { color: '#9d00ff', label: 'Category 5', value: '157+ mph' },
+    { color: '#ff00cc', label: 'Category 4', value: '130-156 mph' },
+    { color: '#ff0033', label: 'Category 3', value: '111-129 mph' },
+    { color: '#ff8000', label: 'Category 2', value: '96-110 mph' },
+    { color: '#ffea00', label: 'Category 1', value: '74-95 mph' },
+    { color: '#00e676', label: 'Tropical Storm', value: '39-73 mph' },
 ];
 
-function showHurricaneLegend() {
-    const legendContainer = d3.select('#hurricane-legend');
-    
-    // Clear and create legend
-    legendContainer.html('')
-        .append('h4')
-        .text('Storm Intensity Colors');
-    
-    const legendItems = legendContainer.selectAll('.legend-item')
+function buildLegend() {
+    const container = d3.select('#hurricane-legend');
+    container.html(''); // clear old content
+
+    const items = container.selectAll('.legend-item')
         .data(hurricaneLegend)
         .enter()
         .append('div')
-        .attr('class', 'legend-item');
-    
-    // Add color dots
-    legendItems.append('div')
+        .attr('class', 'legend-item')
+        .style('display', 'flex')
+        .style('align-items', 'center')
+        .style('gap', '8px')
+        .style('margin', '4px 0');
+
+    // Color box
+    items.append('div')
         .attr('class', 'legend-color')
-        .style('background-color', d => d.color);
-    
-    // Add labels
-    legendItems.append('span')
-        .attr('class', 'legend-label')
-        .text(d => d.label);
-    
-    // Show the legend
-    legendContainer.style('display', 'block');
-}
+        .style('width', '16px')
+        .style('height', '16px')
+        .style('border-radius', '4px')
+        .style('background-color', d => d.color)
+        .style('border', '1px solid black');
 
-// Hide the legend
-function hideHurricaneLegend() {
-    d3.select('#hurricane-legend').style('display', 'none');
+    // Label and value
+    items.append('div')
+        .attr('class', 'legend-text')
+        .html(d => `<strong>${d.label}</strong> — ${d.value}`);
 }
-
+buildLegend();
 
 function showStormTooltip(event, storm) {
     if (!tooltip) return;
@@ -109,7 +104,7 @@ function showStormTooltip(event, storm) {
         .style('left', (event.pageX + 10) + 'px')
         .style('top', (event.pageY - 10) + 'px')
         .transition()
-        .duration(200)
+        .duration(100)
         .style('opacity', 1);
 }
 
@@ -117,7 +112,7 @@ function hideStormTooltip() {
     if (!tooltip) return;
 
     tooltip.transition()
-        .duration(200)
+        .duration(100)
         .style('opacity', 0);
 }
 
@@ -152,10 +147,6 @@ export function onEnterClickHurricanes() {
     
     // --- Column 1: Globe Wrapper ---
     const globeWrapper = container.append('div').attr('id', 'globe-wrapper');
-
-    globeWrapper.append('div')
-        .attr('id', 'hurricane-legend')
-        .attr('class', 'hurricane-legend');
     
     // Place Globe in Left Column (uses existing globe-container styles for background/border)
     globeWrapper.append('div')
@@ -243,8 +234,8 @@ function initializeGlobe() {
     // tooltip
     tooltip = d3.select('#globe-container')
         .append('div')
-        .attr('id', 'storm-tooltip')
-        .attr('class', 'tooltip');
+        .attr('id', 'tooltip')
+        .attr('class', 'storm-tooltip');
     loadGeographicData();
 }
 
@@ -317,7 +308,7 @@ function loadGeographicData() {
                     d.originalY = y;
                 })
                 .attr('class', d => `storm storm-${d.id}`)  
-                .attr('r', 12)
+                .attr('r', 15)
                 .attr('fill', d => d.color)
                 .attr('stroke', 'white')
                 .attr('stroke-width', 2)
@@ -332,7 +323,7 @@ function loadGeographicData() {
                     d3.select(this)
                         .transition()
                         .duration(200)
-                        .attr('r', 14)
+                        .attr('r', 17)
                         .attr('stroke-width', 3);
                     showStormTooltip(event, d);
                 })
@@ -341,7 +332,7 @@ function loadGeographicData() {
                     d3.select(this)
                         .transition()
                         .duration(200)
-                        .attr('r', 12)
+                        .attr('r', 15)
                         .attr('stroke-width', 2);
                     hideStormTooltip();
                 })
@@ -585,6 +576,12 @@ function zoomToStorm(storm) {
         return;
     }
 
+    const container = document.getElementById("globe-wrapper");
+    const rect = container.getBoundingClientRect();
+
+    const containerCenterX = rect.width / 2;
+    const containerCenterY = rect.height / 2;
+
     // Get the bounds for THIS specific storm
     let stormBounds;
     let trackCoords;
@@ -610,6 +607,8 @@ function zoomToStorm(storm) {
             console.error('Unknown storm ID:', storm.id);
             return;
     }
+    d3.select('.instructions').style('opacity', 0);
+    d3.select('#hurricane-legend').classed('hidden', false);
 
     // console.log('Storm bounds:', stormBounds);
     // console.log('Track coordinates count:', trackCoords.length);
@@ -663,7 +662,6 @@ function zoomToStorm(storm) {
     if (!targetViewer.empty()) {
         targetViewer.classed('hidden', false);
     }
-    showHurricaneLegend();
 
     console.log('Starting single zoom transition to bounds...');
 
@@ -673,7 +671,7 @@ function zoomToStorm(storm) {
         .call(
             zoom.transform,
             d3.zoomIdentity
-                .translate(width / 2, height / 2)
+                .translate(containerCenterX, containerCenterY)
                 .scale(scale)
                 .translate(-center[0], -center[1])
         )
@@ -717,7 +715,9 @@ function resetZoom() {
     
     d3.selectAll('circle.storm').style('display', 'block');
 
-    hideHurricaneLegend();
+    d3.select('.instructions').style('opacity', 1);
+
+    d3.select('#hurricane-legend').classed('hidden', true);
 
     // Reset zoom
     if (svg && zoom) {
