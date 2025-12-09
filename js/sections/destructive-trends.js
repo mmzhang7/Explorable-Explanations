@@ -287,28 +287,22 @@ function createTrendVisualization(width, height) {
             d.startYear = decadeMatch ? +decadeMatch[1] : null;
         });
 
-        // Sort data by year (using all data, no filter)
         const sortedData = data
             .filter(d => d.startYear !== null)
             .sort((a, b) => a.startYear - b.startYear);
 
-        // Create year-by-year data by interpolating between decades
-        // For each decade, assign the value to the midpoint year
         const decadeData = sortedData.map(d => ({
-            year: d.startYear + 5, // Use midpoint of decade (e.g., 1851-1860 -> 1856)
+            year: d.startYear + 5,
             tropicalStorms: d['Tropical Storms'],
             hurricanes: d.Hurricanes,
             majorHurricanes: d['Major Hurricanes']
         }));
 
-        // Generate year-by-year data covering all decades (1850-2025)
-        const minYear = Math.floor(decadeData[0].year / 10) * 10; // Round down to nearest decade
-        const maxYear = Math.ceil(decadeData[decadeData.length - 1].year / 10) * 10; // Round up to nearest decade
+        const minYear = Math.floor(decadeData[0].year / 10) * 10;
+        const maxYear = Math.ceil(decadeData[decadeData.length - 1].year / 10) * 10;
         const years = d3.range(minYear, maxYear + 1);
         
-        // Helper function to interpolate between decade points
         const interpolate = (year, property) => {
-            // Handle edge cases: before first point or after last point
             if (year < decadeData[0].year) {
                 return decadeData[0][property];
             }
@@ -316,7 +310,6 @@ function createTrendVisualization(width, height) {
                 return decadeData[decadeData.length - 1][property];
             }
             
-            // Find the two closest decade points
             let before = decadeData[0];
             let after = decadeData[decadeData.length - 1];
             
@@ -328,7 +321,6 @@ function createTrendVisualization(width, height) {
                 }
             }
             
-            // Linear interpolation
             if (before.year === after.year) {
                 return before[property];
             }
@@ -336,7 +328,6 @@ function createTrendVisualization(width, height) {
             return before[property] + (after[property] - before[property]) * t;
         };
         
-        // Interpolate all three trends
         const tropicalStormsTrend = years.map(year => interpolate(year, 'tropicalStorms'));
         const hurricanesTrend = years.map(year => interpolate(year, 'hurricanes'));
         const majorHurricanesTrend = years.map(year => interpolate(year, 'majorHurricanes'));
@@ -349,12 +340,7 @@ function createTrendVisualization(width, height) {
             .domain([minYear, maxYear])
             .range([0, innerWidth]);
         
-        // Find max value across all three datasets
-        const maxValue = Math.max(
-            d3.max(tropicalStormsTrend),
-            d3.max(hurricanesTrend),
-            d3.max(majorHurricanesTrend)
-        );
+        const maxValue = d3.max(tropicalStormsTrend);
         
         const y = d3.scaleLinear()
             .domain([0, maxValue * 1.1])
@@ -364,7 +350,6 @@ function createTrendVisualization(width, height) {
         const g = trendSvg.append('g')
             .attr('transform', `translate(${margin.left},${margin.top})`);
         
-        // Add gridlines (using CSS class 'grid')
         g.append('g')
             .attr('class', 'grid')
             .call(d3.axisLeft(y)
@@ -372,7 +357,6 @@ function createTrendVisualization(width, height) {
                 .tickSize(-innerWidth)
                 .tickFormat(''));
         
-        // Create line generator
         const line = d3.line()
             .x((d, i) => x(years[i]))
             .y(d => y(d))
@@ -406,7 +390,6 @@ function createTrendVisualization(width, height) {
             .attr('stroke-width', 3)
             .attr('stroke-dasharray', '5,5');
         
-        // Add data points for tropical storms (only at decade points for clarity)
         const tropicalStormsPoints = decadeData.map(d => ({
             year: d.year,
             value: d.tropicalStorms
@@ -423,7 +406,6 @@ function createTrendVisualization(width, height) {
             .attr('stroke', 'white')
             .attr('stroke-width', 1.5);
         
-        // Add data points for hurricanes (only at decade points for clarity)
         const hurricanesPoints = decadeData.map(d => ({
             year: d.year,
             value: d.hurricanes
@@ -440,7 +422,6 @@ function createTrendVisualization(width, height) {
             .attr('stroke', 'white')
             .attr('stroke-width', 1.5);
         
-        // Add data points for major hurricanes (only at decade points for clarity)
         const majorHurricanesPoints = decadeData.map(d => ({
             year: d.year,
             value: d.majorHurricanes
@@ -457,7 +438,6 @@ function createTrendVisualization(width, height) {
             .attr('stroke', 'white')
             .attr('stroke-width', 1.5);
         
-        // Add axes
         g.append('g')
             .attr('class', 'x-axis')
             .attr('transform', `translate(0,${innerHeight})`)
@@ -467,7 +447,6 @@ function createTrendVisualization(width, height) {
             .attr('class', 'y-axis')
             .call(d3.axisLeft(y).ticks(8));
         
-        // Add axis labels
         g.append('text')
             .attr('class', 'x-label')
             .attr('x', innerWidth / 2)
@@ -485,7 +464,6 @@ function createTrendVisualization(width, height) {
             .style('font-size', '14px')
             .text('Number of Storms');
         
-        // Add chart title
         g.append('text')
             .attr('class', 'chart-title')
             .attr('x', innerWidth / 2)
@@ -495,7 +473,7 @@ function createTrendVisualization(width, height) {
             .style('font-weight', 'bold')
             .text('Hurricane Trends Over Time (1850-2020)');
         
-        // Add legend
+
         const legend = g.append('g')
             .attr('class', 'legend')
             .attr('transform', `translate(${innerWidth - 200}, 20)`);
@@ -526,7 +504,7 @@ function createTrendVisualization(width, height) {
                 .style('fill', '#2c3e50')
                 .text(item.label);
         });
-    }); // Close .then() callback
+    });
 }
 
 function showDamageTooltip(event, data) {
@@ -556,9 +534,6 @@ function showDamageTooltip(event, data) {
     .transition()
     .duration(200)
     .style('opacity', 1);
-    
-    // The timeout logic for removal should generally be handled on mouseout for D3 charts
-    // Removed the setTimeout here to rely on hideTooltip being called on 'mouseout'
 }
 
 function hideTooltip() {
@@ -571,14 +546,8 @@ function hideTooltip() {
 
 export function onExitDestructiveTrends() {
     console.log('Exiting Destructive & Trends section');
-    // Clean up tooltips
     hideTooltip();
 }
-
-// NOTE: The onProgressDestructiveTrends function's y-scale calculation relies on 
-// internal D3 context (like hardcoded range values) that should ideally be 
-// derived from the actual chart scales defined in createDamageVisualization. 
-// For separation, the logic remains here but note the dependency on hardcoded values.
 
 export function onProgressDestructiveTrends(progress) {
     if (currentView === 'damage' && destructiveSvg && progress > 0.2) {
@@ -588,11 +557,10 @@ export function onProgressDestructiveTrends(progress) {
             .duration(1000)
             .delay((d, i) => i * 100)
             .attr('y', d => {
-                // Hardcoded values from createDamageVisualization: innerHeight=420, top margin=40
                 const innerHeight = 420; 
                 const topMargin = 40; 
-                const yRangeMax = innerHeight + topMargin; // 460
-                const yRangeMin = topMargin; // 40
+                const yRangeMax = innerHeight + topMargin;
+                const yRangeMin = topMargin;
                 
                 const yScale = d3.scaleLinear()
                     .domain([0, 100])
@@ -602,8 +570,8 @@ export function onProgressDestructiveTrends(progress) {
             .attr('height', d => {
                 const innerHeight = 420; 
                 const topMargin = 40; 
-                const yRangeMax = innerHeight + topMargin; // 460
-                const yRangeMin = topMargin; // 40
+                const yRangeMax = innerHeight + topMargin;
+                const yRangeMin = topMargin;
                 
                 const yScale = d3.scaleLinear()
                     .domain([0, 100])
@@ -611,7 +579,6 @@ export function onProgressDestructiveTrends(progress) {
                 return yRangeMax - yScale(d.cost * progress);
             });
     } else if (currentView === 'trend' && trendSvg && progress > 0.3) {
-        // Animate trend lines
         const tropicalStormsLine = trendSvg.select('.line-tropical-storms').node();
         const hurricanesLine = trendSvg.select('.line-hurricanes').node();
         const majorHurricanesLine = trendSvg.select('.line-major-hurricanes').node();
