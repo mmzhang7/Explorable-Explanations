@@ -28,22 +28,22 @@ const IRMA_FILES = [
 ];
 
 const IRMA_TIMESTAMPS = [
-  { file: './data/irma_20170907_12Z_sampled.csv', lat: 20.1980, lon: -68.9962, color: 'purple' },
-  { file: './data/irma_20170907_18Z_sampled.csv', lat: 20.6895, lon: -70.4136, color: 'purple' },
-  { file: './data/irma_20170908_00Z_sampled.csv', lat: 21.1274, lon: -71.8198, color: 'purple' },
-  { file: './data/irma_20170908_05Z_sampled.csv', lat: 21.1274, lon: -71.8198, color: 'magenta' },
-  { file: './data/irma_20170908_06Z_sampled.csv', lat: 21.1274, lon: -71.8198, color: 'magenta' },
-  { file: './data/irma_20170908_12Z_sampled.csv', lat: 21.1274, lon: -71.8198, color: 'magenta' },
-  { file: './data/irma_20170908_18Z_sampled.csv', lat: 21.5121, lon: -73.0139, color: 'purple' },
-  { file: './data/irma_20170909_00Z_sampled.csv', lat: 21.5121, lon: -73.2036, color: 'purple' },
-  { file: './data/irma_20170909_03Z_sampled.csv', lat: 21.8336, lon: -74.7103, color: 'purple' },
-  { file: './data/irma_20170909_06Z_sampled.csv', lat: 22.0406, lon: -76.0049, color: 'magenta' },
-  { file: './data/irma_20170909_12Z_sampled.csv', lat: 22.7217, lon: -79.3077, color: 'red' },
-  { file: './data/irma_20170909_18Z_sampled.csv', lat: 23.1123, lon: -80.2117, color: 'orange' },
-  { file: './data/irma_20170910_00Z_sampled.csv', lat: 23.4302, lon: -80.9148, color: 'red' },
-  { file: './data/irma_20170910_06Z_sampled.csv', lat: 23.7034, lon: -81.3054, color: 'magenta' },
-  { file: './data/irma_20170910_12Z_sampled.csv', lat: 24.5213, lon: -81.5063, color: 'magenta' },
-  { file: './data/irma_20170910_13Z_sampled.csv', lat: 24.7140, lon: -81.5063, color: 'magenta' }
+  { file: './data/irma_20170907_12Z_sampled.csv', lat: 20.1980, lon: -68.9962, color: '#9d00ff' },
+  { file: './data/irma_20170907_18Z_sampled.csv', lat: 20.6895, lon: -70.4136, color: '#9d00ff' },
+  { file: './data/irma_20170908_00Z_sampled.csv', lat: 21.1274, lon: -71.8198, color: '#9d00ff' },
+  { file: './data/irma_20170908_05Z_sampled.csv', lat: 21.1274, lon: -71.8198, color: '#ff00cc' },
+  { file: './data/irma_20170908_06Z_sampled.csv', lat: 21.1274, lon: -71.8198, color: '#ff00cc' },
+  { file: './data/irma_20170908_12Z_sampled.csv', lat: 21.1274, lon: -71.8198, color: '#ff00cc' },
+  { file: './data/irma_20170908_18Z_sampled.csv', lat: 21.5121, lon: -73.0139, color: '#9d00ff' },
+  { file: './data/irma_20170909_00Z_sampled.csv', lat: 21.5121, lon: -73.2036, color: '#9d00ff' },
+  { file: './data/irma_20170909_03Z_sampled.csv', lat: 21.8336, lon: -74.7103, color: '#9d00ff' },
+  { file: './data/irma_20170909_06Z_sampled.csv', lat: 22.0406, lon: -76.0049, color: '#ff00cc' },
+  { file: './data/irma_20170909_12Z_sampled.csv', lat: 22.7217, lon: -79.3077, color: '#ff0033' },
+  { file: './data/irma_20170909_18Z_sampled.csv', lat: 23.1123, lon: -80.2117, color: '#ff8000' },
+  { file: './data/irma_20170910_00Z_sampled.csv', lat: 23.4302, lon: -80.9148, color: '#ff0033' },
+  { file: './data/irma_20170910_06Z_sampled.csv', lat: 23.7034, lon: -81.3054, color: '#ff00cc' },
+  { file: './data/irma_20170910_12Z_sampled.csv', lat: 24.5213, lon: -81.5063, color: '#ff00cc' },
+  { file: './data/irma_20170910_13Z_sampled.csv', lat: 24.7140, lon: -81.5063, color: '#ff00cc' }
 ];
 
 

@@ -24,17 +24,17 @@ const HARVEY_FILES = [
   './data/harvey_20170826_12Z_sampled.csv', './data/harvey_20170826_18Z_sampled.csv'
 ];
 const HARVEY_TIMESTAMPS = [
-  { file: './data/harvey_20170824_12Z_sampled.csv', lat: 23.6729, lon: -93.0801, color: 'green' },
-  { file: './data/harvey_20170824_18Z_sampled.csv', lat: 24.4650, lon: -93.6280, color: 'yellow' },
-  { file: './data/harvey_20170825_00Z_sampled.csv', lat: 24.9835, lon: -94.4043, color: 'yellow' },
-  { file: './data/harvey_20170825_06Z_sampled.csv', lat: 25.5821, lon: -95.1805, color: 'orange' },
-  { file: './data/harvey_20170825_12Z_sampled.csv', lat: 26.3211, lon: -95.8197, color: 'orange' },
-  { file: './data/harvey_20170825_18Z_sampled.csv', lat: 27.1367, lon: -96.3220, color: 'red' },
-  { file: './data/harvey_20170826_00Z_sampled.csv', lat: 27.8095, lon: -96.8068, color: 'magenta' },
-  { file: './data/harvey_20170826_03Z_sampled.csv', lat: 27.9935, lon: -96.8883, color: 'magenta' },
-  { file: './data/harvey_20170826_06Z_sampled.csv', lat: 28.2172, lon: -97.1057, color: 'red' },
-  { file: './data/harvey_20170826_12Z_sampled.csv', lat: 28.7061, lon: -97.3006, color: 'yellow' },
-  { file: './data/harvey_20170826_18Z_sampled.csv', lat: 28.9674, lon: -97.4995, color: 'green' },
+  { file: './data/harvey_20170824_12Z_sampled.csv', lat: 23.6729, lon: -93.0801, color: '#00e676' },
+  { file: './data/harvey_20170824_18Z_sampled.csv', lat: 24.4650, lon: -93.6280, color: '#ffea00' },
+  { file: './data/harvey_20170825_00Z_sampled.csv', lat: 24.9835, lon: -94.4043, color: '#ffea00' },
+  { file: './data/harvey_20170825_06Z_sampled.csv', lat: 25.5821, lon: -95.1805, color: '#ff8000' },
+  { file: './data/harvey_20170825_12Z_sampled.csv', lat: 26.3211, lon: -95.8197, color: '#ff8000' },
+  { file: './data/harvey_20170825_18Z_sampled.csv', lat: 27.1367, lon: -96.3220, color: '#ff0033' },
+  { file: './data/harvey_20170826_00Z_sampled.csv', lat: 27.8095, lon: -96.8068, color: '#ff00cc' },
+  { file: './data/harvey_20170826_03Z_sampled.csv', lat: 27.9935, lon: -96.8883, color: '#ff00cc' },
+  { file: './data/harvey_20170826_06Z_sampled.csv', lat: 28.2172, lon: -97.1057, color: '#ff0033' },
+  { file: './data/harvey_20170826_12Z_sampled.csv', lat: 28.7061, lon: -97.3006, color: '#ffea00' },
+  { file: './data/harvey_20170826_18Z_sampled.csv', lat: 28.9674, lon: -97.4995, color: '#00e676' },
 ];
 
 const dataCache = {};
