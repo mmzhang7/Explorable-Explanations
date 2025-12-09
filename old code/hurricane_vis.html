@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hurricane Viewer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <h1>Hurricane Viewer</h1>
+    <div id="controls">
+        <button id="reset-view">Reset view</button>
+        <div id="status-message"></div>
+    </div>
+    <div id="app-container">
+        <div id="globe"></div>
+        <div id="ida-viewer" class="hidden">
+            <h2>Hurricane Ida (2021) CMI Time-Series</h2>
+        </div>
+        <div id="harvey-viewer" class="hidden">
+            <h2>Hurricane Harvey (2017) CMI Time-Series</h2>
+        </div>
+        <div id="ian-viewer" class="hidden">
+            <h2>Hurricane Ian (2022) CMI Time-Series</h2>
+        </div>
+        <div id="irma-viewer" class="hidden">
+            <h2>Hurricane Irma (2017) CMI Time-Series</h2>
+        </div>
+    </div>
+    <a href="writeup/index.html">→ Read the Writeup</a>
+    <script type="module" src="main.js"></script>
+</body>
+
+</html>

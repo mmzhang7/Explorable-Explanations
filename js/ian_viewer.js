@@ -55,7 +55,7 @@ let timer = null;
 const ANIMATION_DELAY = 500; 
 
 // D3 vars
-let canvas, ctx, ianProjection, colorScale, timestampLabel;
+let canvas, ctx, projection, colorScale, timestampLabel;
 
 // Data Loading
 async function loadData() {
@@ -177,12 +177,12 @@ function createViewerUI(initialIndex = 0) {
   
   ctx = canvas.getContext('2d');
 
-  ianProjection = d3.geoMercator()
+  projection = d3.geoMercator()
     .scale(1) 
     .translate([width / 2, height / 2]);
 
   // fixed projection scale/center once
-  ianProjection.fitExtent([[0, 0], [width, height]], GLOBAL_BOUNDS_GEOJSON);
+  projection.fitExtent([[0, 0], [width, height]], GLOBAL_BOUNDS_GEOJSON);
 
   colorScale = d3.scaleSequential(d3.interpolateYlOrRd).domain([200, 300]);
 

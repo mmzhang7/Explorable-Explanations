@@ -24,6 +24,13 @@ import {
 } from './sections/build-hurricane.js';
 
 import { 
+    initializeHurricaneSandy, 
+    onEnterHurricaneSandy, 
+    onExitHurricaneSandy, 
+    onProgressHurricaneSandy 
+} from './sections/hurricane-sandy.js';
+
+import { 
     initializeClickHurricanes, 
     onEnterClickHurricanes, 
     onExitClickHurricanes, 
@@ -81,6 +88,14 @@ const sections = [
         onEnter: onEnterClickHurricanes,
         onExit: onExitClickHurricanes,
         onProgress: onProgressClickHurricanes
+    },
+    { 
+        id: 'hurricane-sandy-section', 
+        title: 'Hurricane Sandy: Low Category, High Destruction',
+        initialize: initializeHurricaneSandy,
+        onEnter: onEnterHurricaneSandy,
+        onExit: onExitHurricaneSandy,
+        onProgress: onProgressHurricaneSandy
     },
     { 
         id: 'destructive-trends-section', 
@@ -186,9 +201,9 @@ function setupKeyboardNavigation() {
         } else if (event.key === 'ArrowUp' || event.key === 'PageUp') {
             event.preventDefault();
             scrollToSection(currentSection - 1);
-        } else if (event.key >= '1' && event.key <= '6') {
-            event.preventDefault();
-            scrollToSection(parseInt(event.key) - 1);
+        // } else if (event.key >= '1' && event.key <= '6') {
+        //     event.preventDefault();
+        //     scrollToSection(parseInt(event.key) - 1);
         } else if (event.key === 'Home') {
             event.preventDefault();
             scrollToSection(0);
@@ -239,7 +254,7 @@ function updateNavigationButtons() {
 
 // Initialize everything
 async function init() {
-    console.log('Starting Hurricane Scrollarama with 6 sections...');
+    console.log('Starting Hurricane Scrollarama with 7 sections...');
     
     // Add section navigation buttons
     addSectionNavigation();

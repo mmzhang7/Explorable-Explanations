@@ -65,7 +65,7 @@ function showStormTooltip(event, storm) {
         Click to view detailed data
     `)
         .style('left', (event.pageX + 10) + 'px')
-        .style('top', (event.pageY - 20) + 'px')
+        .style('top', (event.pageY - 10) + 'px')
         .transition()
         .duration(200)
         .style('opacity', 1);
