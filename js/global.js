@@ -56,15 +56,10 @@ const scroller = scrollama();
 
 // Store current section
 let currentSection = 0;
+
+// --- UPDATED SECTIONS ARRAY ORDER TO MATCH index.html ---
 const sections = [
-    { 
-        id: 'hook-section', 
-        title: 'Hook',
-        initialize: initializeHook,
-        onEnter: onEnterHook,
-        onExit: onExitHook,
-        onProgress: onProgressHook
-    },
+    // 1. What is a Hurricane Section
     { 
         id: 'what-is-hurricane-section', 
         title: 'What is a Hurricane?',
@@ -73,6 +68,7 @@ const sections = [
         onExit: onExitWhatIsHurricane,
         onProgress: onProgressWhatIsHurricane
     },
+    // 2. Build Your Own Hurricane Section
     { 
         id: 'build-hurricane-section', 
         title: 'Build Your Own Hurricane',
@@ -81,6 +77,7 @@ const sections = [
         onExit: onExitBuildHurricane,
         onProgress: onProgressBuildHurricane
     },
+    // 3. Click on Different Hurricanes Section
     { 
         id: 'click-hurricanes-section', 
         title: 'Click on Different Hurricanes',
@@ -89,6 +86,7 @@ const sections = [
         onExit: onExitClickHurricanes,
         onProgress: onProgressClickHurricanes
     },
+    // 4. Hurricane Sandy Section (New Position)
     { 
         id: 'hurricane-sandy-section', 
         title: 'Hurricane Sandy: Low Category, High Destruction',
@@ -97,6 +95,16 @@ const sections = [
         onExit: onExitHurricaneSandy,
         onProgress: onProgressHurricaneSandy
     },
+    // 5. Hook Section (Moved from top to here)
+    { 
+        id: 'hook-section', 
+        title: 'Costliest Hurricanes',
+        initialize: initializeHook,
+        onEnter: onEnterHook,
+        onExit: onExitHook,
+        onProgress: onProgressHook
+    },
+    // 6. Destructive Power & Trends Section
     { 
         id: 'destructive-trends-section', 
         title: 'Destructive Power & Trends',
@@ -105,6 +113,7 @@ const sections = [
         onExit: onExitDestructiveTrends,
         onProgress: onProgressDestructiveTrends
     },
+    // 7. Preparedness & Action Section
     { 
         id: 'preparedness-action-section', 
         title: 'Preparedness & Action',

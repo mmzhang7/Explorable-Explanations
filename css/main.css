@@ -125,15 +125,101 @@ header p {
 /* SECTION-SPECIFIC STYLING */
 
 #hook-section {
+    /* Override default .scroll-section grid layout */
+    display: flex; 
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
+    padding: 60px 40px; /* Ensure padding is maintained */
 }
 
-#hook-section .text-content h2 {
-    color: white;
-    border-bottom-color: rgba(255,255,255,0.3);
+#hook-section .container {
+    max-width: 900px; /* Max width for the content block */
+    width: 100%;
+    /* Use Grid to organize Title, Vis, and Narrative in a column */
+    display: grid;
+    grid-template-areas:
+        "title"
+        "visualization"
+        "narrative";
+    grid-template-rows: auto 1fr auto;
+    gap: 20px;
+    text-align: center; /* Center text globally in the hook container */
 }
 
+/* Assign areas */
+#hook-section h1 { /* Devastating Damages title */
+    grid-area: title;
+    font-size: 2.2em;
+    margin-bottom: 0;
+}
+
+#hook-visualization { /* The graph container */
+    grid-area: visualization;
+    /* White Box Styling for the Visualization */
+    background: white;
+    padding: 20px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+#hook-section .narrative { /* The text content at the bottom */
+    grid-area: narrative;
+    max-width: 650px; /* Constrain narrative text width */
+    margin: 0 auto;
+    padding-top: 20px;
+}
+
+#hook-section .narrative h2 {
+    color: white; /* Keep narrative header white */
+    border-bottom-color: rgba(255, 255, 255, 0.3);
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+#hook-section .narrative p {
+    font-size: 1em;
+}
+
+.x-axis text {   
+    transform: rotate(-45deg);
+    transform-origin: 0 0; /* Rotate from top-left corner */
+    text-anchor: end; /* Align text end to data point */
+    fill: #000;            
+    font-size: 10px; 
+    dominant-baseline: middle; /* Vertical centering */
+}
+
+.y-axis text {
+    fill: #000;
+    font-size: 12px;
+    font-weight: normal;
+}
+
+/* Mobile Adjustments for Hook Section */
+@media (max-width: 768px) {
+    #hook-section {
+        padding: 40px 20px;
+        min-height: 80vh; /* Adjust min-height on mobile */
+    }
+    #hook-section .container {
+        gap: 15px;
+    }
+    #hook-section h1 {
+        font-size: 1.8em;
+    }
+    #hook-visualization {
+        min-height: 350px;
+        padding: 15px;
+    }
+}
+/* --- END OF HOOK SECTION MODIFICATION --- */
 #click-hurricanes-section {
     /* Header layout: Vertical stack */
     display: flex;
@@ -250,7 +336,26 @@ header p {
 }
 
 /* Tooltip styles */
-#hurricane-tooltip,
+/* Hurricane Anatomy Tooltip */
+#hurricane-tooltip {
+    position: absolute;
+    pointer-events: none;
+    background: #1a237e; /* dark blue background */
+    color: #ffffff;       /* white text */
+    padding: 12px 16px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    font-size: 14px;
+    line-height: 1.5;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    z-index: 1000;
+}
+
+#hurricane-tooltip strong {
+    color: #ffeb3b; /* highlight storm element name */
+}
+
 #damage-tooltip,
 #city-details,
 #action-details {
