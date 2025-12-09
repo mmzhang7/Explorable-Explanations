@@ -56,6 +56,48 @@ const irmaBounds = d3.geoBounds({
   }
 });
 
+const hurricaneLegend = [
+    { color: '#purple', label: 'Category 5', value: '157+ mph' },
+    { color: '#magenta', label: 'Category 4', value: '130-156 mph' },
+    { color: '#red', label: 'Category 3', value: '111-129 mph' },
+    { color: '#orange', label: 'Category 2', value: '96-110 mph' },
+    { color: '#yellow', label: 'Category 1', value: '74-95 mph' },
+    { color: '#green', label: 'Tropical Storm', value: '39-73 mph' },
+];
+
+function showHurricaneLegend() {
+    const legendContainer = d3.select('#hurricane-legend');
+    
+    // Clear and create legend
+    legendContainer.html('')
+        .append('h4')
+        .text('Storm Intensity Colors');
+    
+    const legendItems = legendContainer.selectAll('.legend-item')
+        .data(hurricaneLegend)
+        .enter()
+        .append('div')
+        .attr('class', 'legend-item');
+    
+    // Add color dots
+    legendItems.append('div')
+        .attr('class', 'legend-color')
+        .style('background-color', d => d.color);
+    
+    // Add labels
+    legendItems.append('span')
+        .attr('class', 'legend-label')
+        .text(d => d.label);
+    
+    // Show the legend
+    legendContainer.style('display', 'block');
+}
+
+// Hide the legend
+function hideHurricaneLegend() {
+    d3.select('#hurricane-legend').style('display', 'none');
+}
+
 
 function showStormTooltip(event, storm) {
     if (!tooltip) return;
@@ -110,6 +152,10 @@ export function onEnterClickHurricanes() {
     
     // --- Column 1: Globe Wrapper ---
     const globeWrapper = container.append('div').attr('id', 'globe-wrapper');
+
+    globeWrapper.append('div')
+        .attr('id', 'hurricane-legend')
+        .attr('class', 'hurricane-legend');
     
     // Place Globe in Left Column (uses existing globe-container styles for background/border)
     globeWrapper.append('div')
@@ -270,32 +316,32 @@ function loadGeographicData() {
                     d.originalX = x;
                     d.originalY = y;
                 })
-                .attr('class', 'storm')
-                .attr('r', 8)
+                .attr('class', d => `storm storm-${d.id}`)  
+                .attr('r', 12)
                 .attr('fill', d => d.color)
                 .attr('stroke', 'white')
                 .attr('stroke-width', 2)
                 .attr('transform', d => {
                     const [x, y] = projection([d.lon, d.lat]);
-                    console.log(`Storm ${d.id} at:`, { lon: d.lon, lat: d.lat, x, y });
+                    // console.log(`Storm ${d.id} at:`, { lon: d.lon, lat: d.lat, x, y });
                     return `translate(${x}, ${y})`;
                 })
                 .style('cursor', 'pointer')
                 .on('mouseover', function (event, d) {
-                    console.log(`Mouse over ${d.id}`);
+                    // console.log(`Mouse over ${d.id}`);
                     d3.select(this)
                         .transition()
                         .duration(200)
-                        .attr('r', 12)
+                        .attr('r', 14)
                         .attr('stroke-width', 3);
                     showStormTooltip(event, d);
                 })
                 .on('mouseout', function (event, d) {
-                    console.log(`Mouse out ${d.id}`);
+                    // console.log(`Mouse out ${d.id}`);
                     d3.select(this)
                         .transition()
                         .duration(200)
-                        .attr('r', 8)
+                        .attr('r', 12)
                         .attr('stroke-width', 2);
                     hideStormTooltip();
                 })
@@ -319,9 +365,9 @@ function loadGeographicData() {
             .enter()
             .append('circle')
             .attr('class', 'harvey-timestamp')
-            .attr('r', 5)
+            .attr('r', 7)
             .attr('fill', d => d.color)
-            .attr('stroke', 'black')
+            .attr('stroke', 'white')
             .attr('transform', d => {
                 const [x, y] = projection([d.lon, d.lat]);
                 return `translate(${x}, ${y})`;
@@ -330,15 +376,17 @@ function loadGeographicData() {
                 d3.select(this)
                 .transition()
                 .duration(150)
-                .attr("r", 6)
+                .attr("r", 9)
+                .style('opacity', 0.7);
             })
             .on("mouseleave", function () {
                 d3.select(this)
                     .transition()
                     .duration(150)
-                    .attr("r", 5)
+                    .attr("r", 7)
                     .attr('fill', d => d.color)
-                    .attr('stroke', 'black')
+                    .attr('stroke', 'white')
+                    .style('opacity', 1);
             })
             .on('click', (event, d) => {
                 // Only update the Harvey viewer timestamp
@@ -356,9 +404,9 @@ function loadGeographicData() {
             .enter()
             .append('circle')
             .attr('class', 'ian-timestamp')
-            .attr('r', 5)
+            .attr('r', 7)
             .attr('fill', d => d.color)
-            .attr('stroke', 'black')
+            .attr('stroke', 'white')
             .attr('transform', d => {
                 const [x, y] = projection([d.lon, d.lat]);
                 return `translate(${x}, ${y})`;
@@ -367,15 +415,17 @@ function loadGeographicData() {
                 d3.select(this)
                 .transition()
                 .duration(150)
-                .attr("r", 6)
+                .attr("r", 9)
+                .style('opacity', 0.7);
             })
             .on("mouseleave", function () {
                 d3.select(this)
                     .transition()
                     .duration(150)
-                    .attr("r", 5)
+                    .attr("r", 7)
                     .attr('fill', d => d.color)
-                    .attr('stroke', 'black')
+                    .attr('stroke', 'white')
+                    .style('opacity', 1);
             })
             .on('click', (event, d) => {
                 // Only update the Ian viewer timestamp
@@ -392,9 +442,9 @@ function loadGeographicData() {
             .enter()
             .append('circle')
             .attr('class', 'irma-timestamp')
-            .attr('r', 5)
+            .attr('r', 7)
             .attr('fill', d => d.color)
-            .attr('stroke', 'black')
+            .attr('stroke', 'white')
             .attr('transform', d => {
                 const [x, y] = projection([d.lon, d.lat]);
                 return `translate(${x}, ${y})`;
@@ -403,15 +453,17 @@ function loadGeographicData() {
                 d3.select(this)
                 .transition()
                 .duration(150)
-                .attr("r", 6)
+                .attr("r", 9)
+                .style('opacity', 0.7);
             })
             .on("mouseleave", function () {
                 d3.select(this)
                     .transition()
                     .duration(150)
-                    .attr("r", 5)
+                    .attr("r", 7)
                     .attr('fill', d => d.color)
-                    .attr('stroke', 'black')
+                    .attr('stroke', 'white')
+                    .style('opacity', 1);
             })
             .on('click', (event, d) => {
                 // Only update the Irma viewer timestamp
@@ -428,9 +480,9 @@ function loadGeographicData() {
             .enter()
             .append('circle')
             .attr('class', 'ida-timestamp')
-            .attr('r', 5)
+            .attr('r', 7)
             .attr('fill', d => d.color)
-            .attr('stroke', 'black')
+            .attr('stroke', 'white')
             .attr('transform', d => {
                 const [x, y] = projection([d.lon, d.lat]);
                 return `translate(${x}, ${y})`;
@@ -439,15 +491,17 @@ function loadGeographicData() {
                 d3.select(this)
                 .transition()
                 .duration(150)
-                .attr("r", 6)
+                .attr("r", 9)
+                .style('opacity', 0.7);
             })
             .on("mouseleave", function (event, d) {
                 d3.select(this)
                     .transition()
                     .duration(150)
-                    .attr("r", 5)
+                    .attr("r", 7)
                     .attr('fill', d => d.color)
-                    .attr('stroke', 'black')
+                    .attr('stroke', 'white')
+                    .style('opacity', 1);
             })
             .on('click', (event, d) => {
                 // Only update the ida viewer timestamp
@@ -523,7 +577,7 @@ function createFallbackGlobe() {
 }
 
 function zoomToStorm(storm) {
-    console.log('=== zoomToStorm STARTED ===');
+    // console.log('=== zoomToStorm STARTED ===');
     console.log('Storm clicked:', storm);
 
     if (!projection || !svg || !zoom) {
@@ -557,8 +611,8 @@ function zoomToStorm(storm) {
             return;
     }
 
-    console.log('Storm bounds:', stormBounds);
-    console.log('Track coordinates count:', trackCoords.length);
+    // console.log('Storm bounds:', stormBounds);
+    // console.log('Track coordinates count:', trackCoords.length);
 
     // Calculate zoom to fit ALL track points
     const [[minLon, minLat], [maxLon, maxLat]] = stormBounds;
@@ -599,12 +653,7 @@ function zoomToStorm(storm) {
     // Show the track immediately
     d3.select(`.${storm.id}-track`).style('display', 'block');
     
-    // Hide all other tracks
-    d3.selectAll('.harvey-track, .ian-track, .ida-track, .irma-track')
-        .filter(function() {
-            return !d3.select(this).classed(`${storm.id}-track`);
-        })
-        .style('display', 'none');
+    d3.selectAll('circle.storm').style('display', 'none');
 
     // Hide all viewers first
     d3.selectAll('.viewer-panel').classed('hidden', true);
@@ -614,9 +663,7 @@ function zoomToStorm(storm) {
     if (!targetViewer.empty()) {
         targetViewer.classed('hidden', false);
     }
-
-    // Dim the globe
-    d3.select('#globe').style('opacity', 1);
+    showHurricaneLegend();
 
     console.log('Starting single zoom transition to bounds...');
 
@@ -665,14 +712,12 @@ function resetZoom() {
     d3.selectAll('.viewer-panel').classed('hidden', true);
     d3.select('#globe').style('opacity', 1);
 
-    d3.select('.harvey-track').style('display', 'none');
-    d3.select('.storm-harvey').style('display', 'block');
-    d3.select('.ian-track').style('display', 'none');
-    d3.select('.storm-ian').style('display', 'block');
-    d3.select('.ida-track').style('display', 'none');
-    d3.select('.storm-ida').style('display', 'block');
-    d3.select('.irma-track').style('display', 'none');
-    d3.select('.storm-irma').style('display', 'block');
+    d3.selectAll('.harvey-track, .ian-track, .ida-track, .irma-track')
+        .style('display', 'none');
+    
+    d3.selectAll('circle.storm').style('display', 'block');
+
+    hideHurricaneLegend();
 
     // Reset zoom
     if (svg && zoom) {
@@ -680,12 +725,14 @@ function resetZoom() {
             .duration(750)
             .call(zoom.transform, d3.zoomIdentity);
     }
+    
 }
 
 export function onExitClickHurricanes() {
     console.log('Exiting Click Hurricanes section');
     d3.select('#globe-svg').remove();
     d3.select('#storm-tooltip').remove();
+    d3.select('#hurricane-legend').remove();
     d3.selectAll('.viewer-panel').classed('hidden', true);
     svg = null;
     projection = null;
