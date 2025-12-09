@@ -1,0 +1,259 @@
+body {
+    font: 100%/1.5 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    flex-flow: column;
+    min-height: 100vh;
+    box-sizing: border-box;
+    padding: 1.5em;
+    background: #f0f4f8;
+    color: #333;
+}
+
+
+#controls {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding-bottom: 1em;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+#app-container {
+    display: flex;
+    flex: 1;
+    gap: 30px; 
+    min-height: 70vh; 
+    margin-top: 1.5rem;
+}
+
+/* Globe/Map Styles */
+
+#globe {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
+    border-radius: 12px;
+    overflow: hidden; 
+    background: #e6f7ff; 
+    transition: box-shadow 0.3s ease, opacity 0.5s ease;
+}
+
+#globe svg {
+    width: 100%;
+    height: auto;
+    cursor: grab;
+    user-select: none;
+}
+
+#globe svg:active {
+    cursor: grabbing;
+}
+
+/* Map Feature Colors */
+.water {
+    fill: #a8dadc; 
+}
+
+.land path {
+    fill: #f1faee; 
+    stroke: #457b9d; 
+    stroke-width: 0.5; 
+}
+
+/* Storm Marker Styles */
+.storm {
+    fill: #e63946; 
+    stroke: #1d3557;
+    stroke-width: 2px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.storm:hover {
+    fill: #ff6b6b; 
+    stroke-width: 4px;
+}
+
+
+/* Panels */
+
+#ida-viewer,
+#harvey-viewer,
+#ian-viewer,
+#irma-viewer {
+    width: 360px;
+    padding: 20px;
+    border: none; 
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15); 
+    display: flex;
+    flex-direction: column;
+}
+
+#ida-viewer.hidden,
+#harvey-viewer.hidden,
+#ian-viewer.hidden,
+#irma-viewer.hidden {
+    display: none;
+}
+
+#ida-viewer h3,
+#harvey-viewer h3,
+#ian-viewer h3,
+#irma-viewer h3 {
+    margin-top: 0;
+    font-size: 1.3rem; 
+    font-weight: 600;
+    color: #1d3557; 
+    border-bottom: 2px solid #457b9d; 
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+#ida-viewer-canvas,
+#harvey-viewer-canvas,
+#ian-viewer-canvas,
+#irma-viewer-canvas {
+    background-color: #000000; 
+    border: 2px solid #457b9d;
+    border-radius: 8px;
+    align-self: center;
+    margin-bottom: 20px;
+    box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.5); 
+}
+
+/* Buttons and Controls*/
+
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.button-container button {
+    flex: 1; 
+    padding: 8px 15px;
+    cursor: pointer;
+    border: none;
+    border-radius: 6px;
+    background-color: #457b9d; 
+    color: white;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.button-container button:hover {
+    background-color: #1d3557; 
+    transform: translateY(-1px);
+}
+
+.button-container button:active {
+    transform: translateY(0);
+}
+
+
+/* Slider and Timestamp */
+
+#time-slider { 
+    margin-top: 15px; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    padding: 0 5px;
+}
+#time-slider input[type="range"] { 
+    width: 100%; 
+    height: 8px;
+    background: #e0e0e0;
+    border-radius: 4px;
+    cursor: grab;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+#time-slider input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #e63946;
+    cursor: pointer;
+    border: 2px solid #ffffff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.slider-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: 10px;
+    margin-top: 5px;
+    font-size: 0.9rem;
+    color: #666;
+}
+#timestamp-slider {
+    font-weight: 600;
+    color: #1d3557;
+}
+
+/* Utility/Reset Button */
+
+#reset-view {
+    align-self: flex-start;
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background: #ffffff;
+    cursor: pointer;
+    font-weight: 500;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: background 0.2s, box-shadow 0.2s;
+}
+
+#reset-view:hover {
+    background: #f8f8f8;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.cmi-pixel {
+    opacity: 0.8;
+}
+
+/* Base world fill */
+.country {
+  fill: #d8d8d8;
+  stroke: none;
+}
+
+/* Highlighted country borders */
+.country-outline {
+  fill: none;
+  stroke: #808080;
+  stroke-width: 0.5;
+}
+
+/* Highlighted state borders */
+.state-outline {
+  fill: none;
+  stroke: #808080;
+  stroke-width: 0.5;
+}
+
+.country-label {
+  font-size: 8px;
+  fill: #222;
+  pointer-events: none;
+}
+
+.state-label {
+  font-size: 8px;
+  fill: #222;
+  pointer-events: none;
+}

@@ -51,7 +51,7 @@ let timer = null;
 const ANIMATION_DELAY = 500; 
 
 // D3 vars
-let canvas, ctx, idaProjection, colorScale, timestampLabel;
+let canvas, ctx, projection, colorScale, timestampLabel;
 
 // Data Loading
 async function loadData() {
@@ -173,12 +173,12 @@ function createViewerUI(initialIndex = 0) {
   
   ctx = canvas.getContext('2d');
 
-  idaProjection = d3.geoMercator()
+  projection = d3.geoMercator()
     .scale(1) 
     .translate([width / 2, height / 2]);
 
   // fixed projection scale/center once
-  idaProjection.fitExtent([[0, 0], [width, height]], GLOBAL_BOUNDS_GEOJSON);
+  projection.fitExtent([[0, 0], [width, height]], GLOBAL_BOUNDS_GEOJSON);
 
   colorScale = d3.scaleSequential(d3.interpolateYlOrRd).domain([200, 300]);
 
@@ -210,10 +210,8 @@ function updateViewer(fileIndex) {
     const [_, YYYY, MM, DD, HH] = match;
     displayTime = `${MM}/${DD}/${YYYY} ${HH}:00`;
   }
-
   timestampLabel.text(`Timestamp: ${displayTime}`);
 
-  
   // Clear Canvas 
   ctx.clearRect(0, 0, width, height);
   
@@ -221,8 +219,7 @@ function updateViewer(fileIndex) {
   ctx.globalAlpha = 0.5;
 
   for (const d of data) {
-    const [x, y] = idaProjection([d.lon, d.lat]);
-    
+    const [x, y] = projection([d.lon, d.lat]);
     if (x < 0 || x > width || y < 0 || y > height) continue;
 
     ctx.fillStyle = colorScale(d.CMI);

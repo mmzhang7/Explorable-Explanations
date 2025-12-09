@@ -1,0 +1,691 @@
+/* GLOBAL RESET & BASE STYLES */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background: #f8f9fa;
+}
+
+/* HEADER STYLES */
+header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 40px;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+header h1 {
+    font-size: 2.5em;
+    margin-bottom: 10px;
+}
+
+header p {
+    font-size: 1.2em;
+    opacity: 0.9;
+}
+
+/* SCROLL SECTIONS & LAYOUT */
+.scroll-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    min-height: 100vh;
+    padding: 60px 40px;
+    align-items: center;
+    border-bottom: 2px solid #3498db;
+    overflow-x: hidden; /* FIX 1: Prevents horizontal overflow in sections */
+}
+
+@media (max-width: 768px) {
+    .scroll-section {
+        grid-template-columns: 1fr;
+        padding: 40px 20px;
+    }
+}
+
+.text-content {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.text-content h2 {
+    color: #2c3e50;
+    font-size: 2em;
+    margin-bottom: 20px;
+    border-bottom: 3px solid #3498db;
+    padding-bottom: 10px;
+}
+
+.text-content p {
+    font-size: 1.1em;
+    margin-bottom: 15px;
+}
+
+.visualization {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    min-height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-height: 85vh;
+    height: 100%;
+}
+
+/* PROGRESS INDICATOR */
+#progress-indicator {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-family: monospace;
+    font-size: 0.9em;
+    z-index: 1000;
+}
+
+/* ACTIVE SECTION STYLING */
+.scroll-section.active {
+    background: rgba(52, 152, 219, 0.05);
+}
+
+/* GRAPH PLACEHOLDERS (Combined) */
+.graph-placeholder {
+    width: 100%;
+    height: 300px;
+    background: linear-gradient(45deg, #f5f7fa 25%, #e4e7eb 25%, #e4e7eb 50%, #f5f7fa 50%, #f5f7fa 75%, #e4e7eb 75%);
+    background-size: 20px 20px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    font-style: italic;
+    /* Animation */
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.6; }
+}
+
+/* SECTION-SPECIFIC STYLING */
+
+#hook-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+#hook-section .text-content h2 {
+    color: white;
+    border-bottom-color: rgba(255,255,255,0.3);
+}
+
+#click-hurricanes-section {
+    /* Header layout: Vertical stack */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-height: 100vh;
+    height:100%;
+    
+    background: linear-gradient(to bottom, #0d1b2a, #1a237e); 
+    color: white;
+}
+
+/* --- SECTION 4: CLICK HURRICANES (Globe) LAYOUT ADJUSTMENTS --- */
+
+/* 1. Shrink and center the text header */
+#click-hurricanes-section .text-content {
+    order: -1;
+    width: 100%; 
+    max-width: none;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#click-hurricanes-section .text-content h2 {
+    font-size: 1.8em;
+    border-bottom: none; 
+    padding-bottom: 0;
+}
+
+#click-hurricanes-section .text-content p {
+    font-size: 1em;
+    opacity: 0.8;
+}
+
+/* 2. Visualization Container (The 1fr 1fr grid wrapper created by JS) */
+#cities-visualization {
+    /* REMOVE width/max-width to rely on JS grid width (Fix 2) */
+    padding: 0;
+    background: none;
+    box-shadow: none;
+    min-height: auto;
+    max-width: none;
+    width: 100%; /* Ensure it fills the space available in the flex column */
+    margin: 0;
+}
+
+#cities-visualization #globe-wrapper {
+    height: 100%;
+}
+
+/* Globe container */
+#globe-container {
+    position: relative; 
+    background: #0d1b2a;
+    border-radius: 10px;
+    border: 2px solid #4fc3f7;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    height: 100% !important; /* Uses height set by JS */
+    width: 100%; /* NEW: Ensures width stays within the column */
+}
+
+/* Viewer Panel Container (Right column) */
+#hurricane-viewers {
+    position: relative;
+    top: auto;
+    right: auto;
+    z-index: 100;
+    display: flex; 
+    flex-direction: column;
+    height: 100%; 
+    justify-content: center;
+}
+
+/* Individual Viewer Panels (Content injected via JS) */
+.viewer-panel {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    margin-bottom: 10px; 
+    transition: all 0.3s ease;
+    display: block; 
+}
+
+.viewer-panel.hidden {
+    display: none !important;
+}
+
+/* Globe controls */
+.globe-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 15px;
+}
+
+.instructions {
+    font-size: 14px;
+    color: #90a4ae;
+    text-align: center;
+    margin-top: 10px;
+}
+
+/* Storm markers animation */
+.storm {
+    animation: pulse 2s infinite;
+}
+
+#globe {
+    transition: opacity 0.5s;
+}
+
+/* Tooltip styles */
+#hurricane-tooltip,
+#damage-tooltip,
+#city-details,
+#action-details {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* --- SECTION 5: DESTRUCTIVE TRENDS STYLES --- */
+
+/* Visualization Wrapper for the Dual View */
+#destructive-visualization {
+    position: relative;
+    max-height: none !important;
+    height: auto !important;
+    display: block !important;
+    align-items: flex-start !important;
+    overflow: visible !important;
+}
+
+/* Ensure the visualization container doesn't overflow */
+#destructive-viz-container {
+    width: 100%;
+    overflow: visible;
+    position: relative;
+    min-height: 500px;
+}
+
+/* Ensure SVGs are properly sized */
+#destructive-viz-container svg {
+    width: 100%;
+    height: 500px;
+}
+
+/* Let inline styles control display - don't force display:block */
+#destructive-viz-container svg[style*="display: none"],
+#destructive-viz-container svg[style*="display:none"] {
+    display: none !important;
+    visibility: hidden !important;
+}
+
+/* Ensure insights are always visible */
+#destructive-visualization .combined-insights {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+}
+
+/* Toggle Button Container */
+.view-toggle {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Toggle Buttons */
+.toggle-btn {
+    padding: 10px 20px;
+    background: #95a5a6;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s ease, transform 0.1s ease;
+}
+
+.toggle-btn:hover {
+    filter: brightness(1.1);
+}
+
+.toggle-btn:active {
+    transform: translateY(1px);
+}
+
+#damage-view-btn {
+    border-radius: 5px 0 0 5px;
+}
+
+#trend-view-btn {
+    border-radius: 0 5px 5px 0;
+}
+
+/* Active Toggle State */
+.toggle-btn.active {
+    font-weight: bold;
+    box-shadow: 0 0 8px rgba(0,0,0,0.2);
+}
+
+/* Combined Insights Box */
+.combined-insights {
+    margin-top: 30px;
+    background: #f8f9fa; 
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+}
+
+.combined-insights h4 {
+    margin: 0 0 15px 0;
+    color: #2c3e50;
+}
+
+.combined-insights > div {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.combined-insights div div {
+    background: white;
+    padding: 15px;
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.combined-insights h5 {
+    margin: 0 0 8px 0;
+}
+
+.combined-insights p {
+    margin: 0;
+    font-size: 14px;
+}
+
+/* Specific Border Colors for Insights */
+.combined-insights div:nth-child(1) { border-left: 4px solid #e74c3c; } 
+.combined-insights div:nth-child(2) { border-left: 4px solid #3498db; }
+.combined-insights div:nth-child(3) { border-left: 4px solid #f39c12; }
+
+/* D3 Elements Styling */
+.grid line {
+    stroke: #e0e0e0;
+    stroke-dasharray: 2,2;
+}
+
+.tooltip {
+    background: rgba(255,255,255,0.95);
+    padding: 10px;
+    border-radius: 6px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    pointer-events: none;
+    z-index: 100;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.tooltip strong {
+    color: #34495e;
+}
+
+/* --- SECTION 6: PREPAREDNESS & ACTION STYLES --- */
+
+/* Tab Navigation */
+.tab-navigation {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Tab Buttons */
+.tab-btn {
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s ease, transform 0.1s ease;
+}
+
+.tab-btn.active {
+    font-weight: bold;
+    box-shadow: 0 0 8px rgba(0,0,0,0.2);
+}
+
+#cities-tab {
+    border-radius: 5px 0 0 5px;
+}
+
+#action-tab {
+    border-radius: 0 5px 5px 0;
+}
+
+/* Impact Statistics Container */
+.impact-container {
+    margin-top: 30px;
+}
+
+.impact-container h4 {
+    margin: 0 0 15px 0;
+    color: #2c3e50;
+    text-align: center;
+}
+
+.impact-container > div {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.impact-container > div > div {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.impact-container .font-2em {
+    font-size: 2em;
+    margin-bottom: 10px;
+}
+
+.impact-container .font-14px {
+    font-size: 14px;
+    color: #666;
+}
+
+/* Action Steps Grid */
+.action-grid {
+    margin-top: 40px;
+}
+
+.action-grid h4 {
+    margin: 0 0 20px 0;
+    color: #2c3e50;
+    text-align: center;
+}
+
+.action-grid > div {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.action-grid > div > div {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.action-grid .icon-24px {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.action-grid h5 {
+    margin: 0 0 10px 0;
+    color: #2c3e50;
+}
+
+.action-grid p {
+    margin: 0;
+    font-size: 14px;
+    color: #666;
+}
+
+/* Specific Border Colors for Action Steps */
+.action-grid div:nth-child(1) { border-top: 4px solid #3498db; }
+.action-grid div:nth-child(2) { border-top: 4px solid #2ecc71; }
+.action-grid div:nth-child(3) { border-top: 4px solid #f39c12; }
+.action-grid div:nth-child(4) { border-top: 4px solid #9b59b6; }
+
+
+/* Tooltip for City/Action Details */
+#action-visualization .tooltip {
+    max-width: 300px;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    line-height: 1.4;
+}
+
+#action-visualization .tooltip h4 {
+    margin: 0 0 10px 0;
+    font-size: 16px;
+}
+
+#action-visualization .tooltip hr {
+    margin: 10px 0;
+    border: 0;
+    border-top: 1px solid #ccc;
+}
+
+/* --- GLOBAL NAVIGATION BUTTON STYLES (js/global.js) --- */
+
+#section-navigation {
+    position: fixed;
+    bottom: 70px;
+    right: 20px;
+    z-index: 1000;
+}
+
+#section-navigation button {
+    display: block;
+    margin-bottom: 5px;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    color: white;
+    transition: opacity 0.3s ease, background 0.2s ease;
+}
+
+#prev-section {
+    background: #3498db;
+}
+
+#prev-section:hover:not([style*="opacity: 0.5"]) {
+    background: #2980b9;
+}
+
+#next-section {
+    background: #2ecc71;
+}
+
+#next-section:hover:not([style*="opacity: 0.5"]) {
+    background: #27ae60;
+}
+
+/* --- HURRICANE SANDY SECTION STYLES --- */
+
+#sandy-visualization {
+    max-height: none !important;
+    height: auto !important;
+    display: block !important;
+    align-items: flex-start !important;
+    overflow: visible !important;
+}
+
+.sandy-facts-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.sandy-headline {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 20px;
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+}
+
+.sandy-headline h3 {
+    font-size: 2em;
+    margin-bottom: 10px;
+    color: white;
+}
+
+.sandy-subtitle {
+    font-size: 1.1em;
+    opacity: 0.95;
+    margin: 0;
+}
+
+/* Sandy Facts Grid */
+.sandy-facts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    margin-bottom: 40px;
+}
+
+.fact-card {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-top: 4px solid #e74c3c;
+    text-align: center;
+}
+
+.fact-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+.fact-card h4 {
+    margin: 0 0 12px 0;
+    color: #2c3e50;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.fact-main {
+    margin: 0 0 10px 0;
+    font-size: 1em;
+    color: #2c3e50;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.fact-detail {
+    margin: 0;
+    font-size: 0.9em;
+    color: #666;
+    line-height: 1.5;
+    font-style: italic;
+}
+
+/* Sandy Insight Box */
+.sandy-insight-box {
+    background: #f8f9fa;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+    border-left: 5px solid #e74c3c;
+    margin-top: 30px;
+}
+
+.sandy-insight-box h4 {
+    margin: 0 0 15px 0;
+    color: #2c3e50;
+    font-size: 1.4em;
+}
+
+.sandy-insight-box p {
+    margin: 0 0 15px 0;
+    font-size: 1em;
+    line-height: 1.6;
+    color: #555;
+}
+
+.sandy-insight-box ul {
+    margin: 15px 0;
+    padding-left: 25px;
+}
+
+.sandy-insight-box li {
+    margin: 10px 0;
+    line-height: 1.6;
+    color: #555;
+}
+
+.sandy-insight-box strong {
+    color: #e74c3c;
+}
