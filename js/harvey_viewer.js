@@ -7,24 +7,34 @@ const GLOBAL_BOUNDS_GEOJSON = {
         "type": "Polygon",
         "coordinates": [[
             [-104, 24.0],
-            [-104, 46.0],
-            [-85, 46.0],
+            [-104, 43.0],
+            [-85, 43.0],
             [-85, 24.0],
             [-104, 24.0]
         ]]
     }
 };
+let currentIndex = 0;
 
 // fast '_sampled.csv' files (sampled 1/3)
-// NOTE: harvey_viewer.js lives in /js, while data files live in /data.
-// Use ../data so fetches resolve correctly when the module is loaded.
 const HARVEY_FILES = [
-  '../data/harvey_20170824_12Z_sampled.csv', '../data/harvey_20170824_18Z_sampled.csv', '../data/harvey_20170825_00Z_sampled.csv', 
-  '../data/harvey_20170825_03Z_sampled.csv', '../data/harvey_20170825_06Z_sampled.csv', '../data/harvey_20170825_09Z_sampled.csv',
-  '../data/harvey_20170825_12Z_sampled.csv', '../data/harvey_20170825_15Z_sampled.csv', '../data/harvey_20170825_18Z_sampled.csv', 
-  '../data/harvey_20170825_21Z_sampled.csv', '../data/harvey_20170826_00Z_sampled.csv', '../data/harvey_20170826_03Z_sampled.csv', 
-  '../data/harvey_20170826_06Z_sampled.csv', '../data/harvey_20170826_09Z_sampled.csv', '../data/harvey_20170826_12Z_sampled.csv', 
-  '../data/harvey_20170826_15Z_sampled.csv'
+  './data/harvey_20170824_12Z_sampled.csv', './data/harvey_20170824_18Z_sampled.csv', './data/harvey_20170825_00Z_sampled.csv', 
+  './data/harvey_20170825_06Z_sampled.csv', './data/harvey_20170825_12Z_sampled.csv', './data/harvey_20170825_18Z_sampled.csv', 
+  './data/harvey_20170826_00Z_sampled.csv', './data/harvey_20170826_03Z_sampled.csv', './data/harvey_20170826_06Z_sampled.csv', 
+  './data/harvey_20170826_12Z_sampled.csv', './data/harvey_20170826_18Z_sampled.csv'
+];
+const HARVEY_TIMESTAMPS = [
+  { file: './data/harvey_20170824_12Z_sampled.csv', lat: 23.6729, lon: -93.0801, color: 'green' },
+  { file: './data/harvey_20170824_18Z_sampled.csv', lat: 24.4650, lon: -93.6280, color: 'yellow' },
+  { file: './data/harvey_20170825_00Z_sampled.csv', lat: 24.9835, lon: -94.4043, color: 'yellow' },
+  { file: './data/harvey_20170825_06Z_sampled.csv', lat: 25.5821, lon: -95.1805, color: 'orange' },
+  { file: './data/harvey_20170825_12Z_sampled.csv', lat: 26.3211, lon: -95.8197, color: 'orange' },
+  { file: './data/harvey_20170825_18Z_sampled.csv', lat: 27.1367, lon: -96.3220, color: 'red' },
+  { file: './data/harvey_20170826_00Z_sampled.csv', lat: 27.8095, lon: -96.8068, color: 'magenta' },
+  { file: './data/harvey_20170826_03Z_sampled.csv', lat: 27.9935, lon: -96.8883, color: 'magenta' },
+  { file: './data/harvey_20170826_06Z_sampled.csv', lat: 28.2172, lon: -97.1057, color: 'red' },
+  { file: './data/harvey_20170826_12Z_sampled.csv', lat: 28.7061, lon: -97.3006, color: 'yellow' },
+  { file: './data/harvey_20170826_18Z_sampled.csv', lat: 28.9674, lon: -97.4995, color: 'green' },
 ];
 
 const dataCache = {};
@@ -109,7 +119,7 @@ function resetAnimation() {
 }
 
 // Viz/UI
-function createViewerUI() {
+function createViewerUI(initialIndex = 0) {
   const container = d3.select(viewerId);
 
   container.html('');
@@ -143,11 +153,12 @@ function createViewerUI() {
     .attr('id', 'timestamp-slider')
     .attr('min', 0)
     .attr('max', HARVEY_FILES.length - 1)
-    .attr('value', 0)
+    .attr('value', initialIndex)      // set initial UI value
     .attr('step', 1)
-    .on('input', function() {
+    .on('change', function() {
       stopAnimation();
-      updateViewer(+this.value);
+      currentIndex = +this.value;
+      updateViewer(currentIndex);
     });
 
   // 3. Canvas Container 
@@ -169,7 +180,8 @@ function createViewerUI() {
   colorScale = d3.scaleSequential(d3.interpolateYlOrRd).domain([200, 300]);
 
   viewerReady = true;
-  updateViewer(0);
+  currentIndex = initialIndex;
+  updateViewer(initialIndex);
 }
 
 /**
@@ -182,24 +194,23 @@ function updateViewer(fileIndex) {
   const fileName = HARVEY_FILES[fileIndex];
   const data = dataCache[fileName]; 
 
-  // Default display label
-  let displayTime = '(unknown)';
-
   if (!data || data.length === 0) {
       timestampLabel.text(`Timestamp: ${fileName.replace('.csv', '')} - (No Data Available)`);
       ctx.clearRect(0, 0, width, height); 
       return;
   }
   
+  let displayTime = "(unknown)";
+
   const match = fileName.match(/harvey_(\d{4})(\d{2})(\d{2})_(\d{2})Z/);
   if (match) {
     const [_, YYYY, MM, DD, HH] = match;
     displayTime = `${MM}/${DD}/${YYYY} ${HH}:00`;
   }
 
-  // Update UI with the resolved time label once
   timestampLabel.text(`Timestamp: ${displayTime}`);
 
+  
   // Clear Canvas 
   ctx.clearRect(0, 0, width, height);
   
@@ -214,14 +225,32 @@ function updateViewer(fileIndex) {
     ctx.fillStyle = colorScale(d.CMI);
     ctx.fillRect(x - POINT_SIZE / 2, y - POINT_SIZE / 2, POINT_SIZE, POINT_SIZE);
   }
+
+  timestampLabel.text(`Timestamp: ${displayTime}`);
 }
 
-export async function initializeHarveyViewer() {
+export async function initializeHarveyViewer(initialIndex = 0) {
+  // if already initialized, don't re-create UI — just set the timestamp
+  if (viewerReady) {
+    // viewer already exists; just show and set timestamp
+    d3.select(viewerId).classed('hidden', false);
+    setHarveyTimestamp(initialIndex);
+    return;
+  }
+
   const loadSuccess = await loadData();
 
   if (loadSuccess) {
-    createViewerUI();
+    createViewerUI(initialIndex);
   } else {
     d3.select(viewerId).html('<p>Error: Could not load all Hurricane Harvey data files. Check file paths and accessibility.</p>');
   }
 }
+
+export function setHarveyTimestamp(index) {
+  d3.select('#timestamp-slider').property('value', index);
+  stopAnimation();
+  updateViewer(index);
+}
+
+export { HARVEY_TIMESTAMPS };

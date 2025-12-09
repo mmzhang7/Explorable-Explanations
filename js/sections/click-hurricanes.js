@@ -1,19 +1,61 @@
 // js/sections/click-hurricanes.js
 import * as d3 from 'd3';
 import * as topojson from 'https://cdn.jsdelivr.net/npm/topojson-client@3/+esm';
-import { initializeIdaViewer } from '../ida_viewer.js';
-import { initializeHarveyViewer } from '../harvey_viewer.js';
-import { initializeIanViewer } from '../ian_viewer.js';
-import { initializeIrmaViewer } from '../irma_viewer.js';
+import { initializeIdaViewer, IDA_TIMESTAMPS, setIdaTimestamp } from '../ida_viewer.js';
+import { initializeHarveyViewer, HARVEY_TIMESTAMPS, setHarveyTimestamp} from '../harvey_viewer.js';
+import { initializeIanViewer, IAN_TIMESTAMPS, setIanTimestamp } from '../ian_viewer.js';
+import { initializeIrmaViewer, IRMA_TIMESTAMPS, setIrmaTimestamp } from '../irma_viewer.js';
 
-let svg, mapGroup, landGroup, stormGroup, borderGroup, labelGroup;
+let svg, mapGroup, landGroup, stormGroup;
 let projection, pathGenerator;
 let zoom;
+let originalStormPositions = [];
 let isGlobeInitialized = false;
 
 let width = 800;
 let height = 600;
 let tooltip;
+
+const harveyCoords = HARVEY_TIMESTAMPS.map(d => [d.lon, d.lat]);
+
+const harveyBounds = d3.geoBounds({
+  type: "Feature",
+  geometry: {
+    type: "MultiPoint",
+    coordinates: harveyCoords
+  }
+});
+
+const ianCoords = IAN_TIMESTAMPS.map(d => [d.lon, d.lat]);
+
+const ianBounds = d3.geoBounds({
+  type: "Feature",
+  geometry: {
+    type: "MultiPoint",
+    coordinates: ianCoords
+  }
+});
+
+const idaCoords = IDA_TIMESTAMPS.map(d => [d.lon, d.lat]);
+
+const idaBounds = d3.geoBounds({
+  type: "Feature",
+  geometry: {
+    type: "MultiPoint",
+    coordinates: idaCoords
+  }
+});
+
+const irmaCoords = IRMA_TIMESTAMPS.map(d => [d.lon, d.lat]);
+
+const irmaBounds = d3.geoBounds({
+  type: "Feature",
+  geometry: {
+    type: "MultiPoint",
+    coordinates: irmaCoords
+  }
+});
+
 
 function showStormTooltip(event, storm) {
     if (!tooltip) return;
@@ -48,6 +90,7 @@ export function initializeClickHurricanes() {
 
 export function onEnterClickHurricanes() {
     console.log('Entering Click Hurricanes section');
+    d3.select('globe svg').remove();
 
     const container = d3.select('#cities-visualization');
     // Calculate dimensions
@@ -61,7 +104,7 @@ export function onEnterClickHurricanes() {
     
     // Set the .visualization container to be a dynamic grid
     container.style('display', 'grid')
-             .style('grid-template-columns', '1fr 1fr') // 50/50 split
+             .style('grid-template-columns', '70% 30%') // 50/50 split
              .style('gap', '20px')
              .style('padding', '0');
     
@@ -141,8 +184,6 @@ function initializeGlobe() {
 
     // groups for different map elements
     landGroup = mapGroup.append('g').attr('class', 'land');
-    borderGroup = mapGroup.append('g').attr('class', 'borders');
-    labelGroup = mapGroup.append('g').attr('class', 'labels');
     stormGroup = mapGroup.append('g').attr('class', 'storms');
 
     zoom = d3.zoom()
@@ -162,42 +203,7 @@ function initializeGlobe() {
 }
 
 function loadGeographicData() {
-    // Countries we want outlined + labeled
-    const TARGET_COUNTRIES = new Set([
-        "Mexico",
-        "Cuba",
-        "Bahamas",
-        "Haiti",
-        "Jamaica",
-        "Dominican Rep.",
-        "Puerto Rico"
-    ]);
-
-    // US States we want outlined + labeled
-    const TARGET_STATES = new Set([
-        "Florida",
-        "Texas",
-        "Louisiana",
-        "Mississippi",
-        "Alabama",
-        "Georgia"
-    ]);
-
-    const LABEL_OFFSETS = {
-        "Mexico": { dx: 10, dy: -5 },
-        "Cuba": { dx: -25, dy: 5 },
-        "Bahamas": { dx: 10, dy: 0 },
-        "Haiti": { dx: 0, dy: -20 },
-        "Jamaica": { dx: 5, dy: 15 },
-        "Dominican Rep.": { dx: 10, dy: 30 },
-        "Puerto Rico": { dx: 5, dy: -9 },
-        "Florida": { dx: 5, dy: -15 },
-        "Texas": { dx: 10, dy: -5 },
-        "Louisiana": { dx: 0, dy: 12 },
-        "Mississippi": { dx: 10, dy: -10 },
-        "Alabama": { dx: 0, dy: 15 },
-        "Georgia": { dx: 3, dy: -5 }
-    };
+    
 
     // Hurricane data
     const storms = [
@@ -230,6 +236,7 @@ function loadGeographicData() {
             color: '#f39c12'
         }
     ];
+    
 
     Promise.all([
         d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json'),
@@ -237,16 +244,6 @@ function loadGeographicData() {
     ])
         .then(([world, us]) => {
             const allCountries = topojson.feature(world, world.objects.countries).features;
-            const allStates = topojson.feature(us, us.objects.states).features;
-
-            // Filter only the selected ones
-            const filteredCountries = allCountries.filter(
-                d => TARGET_COUNTRIES.has(d.properties.name)
-            );
-
-            const filteredStates = allStates.filter(
-                d => TARGET_STATES.has(d.properties.name)
-            );
 
             // world land
             landGroup.selectAll('path')
@@ -259,94 +256,6 @@ function loadGeographicData() {
                 .attr('stroke', '#2e7d32')
                 .attr('stroke-width', 0.5);
 
-            // OUTLINES for only selected countries
-            borderGroup.selectAll('.country-outline')
-                .data(filteredCountries)
-                .enter()
-                .append('path')
-                .attr('class', 'country-outline')
-                .attr('d', pathGenerator)
-                .attr('fill', 'none')
-                .attr('stroke', '#2c3e50')
-                .attr('stroke-width', 1.5);
-
-            // OUTLINES for only selected states
-            borderGroup.selectAll('.state-outline')
-                .data(filteredStates)
-                .enter()
-                .append('path')
-                .attr('class', 'state-outline')
-                .attr('d', pathGenerator)
-                .attr('fill', 'none')
-                .attr('stroke', '#2c3e50')
-                .attr('stroke-width', 1.5);
-
-            // LABELS for selected countries
-            labelGroup.selectAll('.country-label')
-                .data(filteredCountries)
-                .enter()
-                .append('text')
-                .attr('class', 'country-label')
-                .attr('transform', d => `translate(${pathGenerator.centroid(d)})`)
-                .attr('dx', d => LABEL_OFFSETS[d.properties.name]?.dx || 0)
-                .attr('dy', d => LABEL_OFFSETS[d.properties.name]?.dy || 0)
-                .text(d => d.properties.name)
-                .attr('text-anchor', 'middle')
-                .style('font-size', '12px')
-                .style('font-weight', 'bold')
-                .style('fill', '#2c3e50')
-                .style('pointer-events', 'none');
-
-            // LABELS for selected states
-            labelGroup.selectAll('.state-label')
-                .data(filteredStates)
-                .enter()
-                .append('text')
-                .attr('class', 'state-label')
-                .attr('transform', d => `translate(${pathGenerator.centroid(d)})`)
-                .attr('dx', d => LABEL_OFFSETS[d.properties.name]?.dx || 0)
-                .attr('dy', d => LABEL_OFFSETS[d.properties.name]?.dy || 0)
-                .text(d => d.properties.name)
-                .attr('text-anchor', 'middle')
-                .style('font-size', '12px')
-                .style('font-weight', 'bold')
-                .style('fill', '#2c3e50')
-                .style('pointer-events', 'none');
-
-            // storm markers
-            stormGroup.selectAll('circle')
-                .data(storms)
-                .enter()
-                .append('circle')
-                .attr('class', 'storm')
-                .attr('r', 8)
-                .attr('fill', d => d.color)
-                .attr('stroke', 'white')
-                .attr('stroke-width', 2)
-                .attr('transform', d => {
-                    const [x, y] = projection([d.lon, d.lat]);
-                    return `translate(${x}, ${y})`;
-                })
-                .style('cursor', 'pointer')
-                .on('mouseover', function (event, d) {
-                    d3.select(this)
-                        .transition()
-                        .duration(200)
-                        .attr('r', 12)
-                        .attr('stroke-width', 3);
-                    showStormTooltip(event, d);
-                })
-                .on('mouseout', function (event, d) {
-                    d3.select(this)
-                        .transition()
-                        .duration(200)
-                        .attr('r', 8)
-                        .attr('stroke-width', 2);
-                    hideStormTooltip();
-                })
-                .on('click', (event, d) => zoomToStorm(d))
-                .append('title')
-                .text(d => d.name);
 
             // Pulsing marker animation
             // storm labels
@@ -355,6 +264,12 @@ function loadGeographicData() {
                 .data(storms)
                 .enter()
                 .append('circle')
+                .each(function(d) {
+                    // Store original projected position
+                    const [x, y] = projection([d.lon, d.lat]);
+                    d.originalX = x;
+                    d.originalY = y;
+                })
                 .attr('class', 'storm')
                 .attr('r', 8)
                 .attr('fill', d => d.color)
@@ -394,6 +309,151 @@ function loadGeographicData() {
                 .text(d => d.name);
             // Setup reset button (using module-level function)
             d3.select('#reset-view').on('click', resetZoom);
+
+            const harveyTrack = stormGroup.append('g')
+            .attr('class', 'harvey-track')
+            .style('display', 'none');
+
+            harveyTrack.selectAll('circle')
+            .data(HARVEY_TIMESTAMPS)
+            .enter()
+            .append('circle')
+            .attr('class', 'harvey-timestamp')
+            .attr('r', 5)
+            .attr('fill', d => d.color)
+            .attr('stroke', 'black')
+            .attr('transform', d => {
+                const [x, y] = projection([d.lon, d.lat]);
+                return `translate(${x}, ${y})`;
+            })
+            .on("mouseenter", function () {
+                d3.select(this)
+                .transition()
+                .duration(150)
+                .attr("r", 6)
+            })
+            .on("mouseleave", function () {
+                d3.select(this)
+                    .transition()
+                    .duration(150)
+                    .attr("r", 5)
+                    .attr('fill', d => d.color)
+                    .attr('stroke', 'black')
+            })
+            .on('click', (event, d) => {
+                // Only update the Harvey viewer timestamp
+                const idx = HARVEY_TIMESTAMPS.indexOf(d);
+                setHarveyTimestamp(idx);
+            });
+
+
+            const ianTrack = stormGroup.append('g')
+            .attr('class', 'ian-track')
+            .style('display', 'none');
+
+            ianTrack.selectAll('circle')
+            .data(IAN_TIMESTAMPS)
+            .enter()
+            .append('circle')
+            .attr('class', 'ian-timestamp')
+            .attr('r', 5)
+            .attr('fill', d => d.color)
+            .attr('stroke', 'black')
+            .attr('transform', d => {
+                const [x, y] = projection([d.lon, d.lat]);
+                return `translate(${x}, ${y})`;
+            })
+            .on("mouseenter", function () {
+                d3.select(this)
+                .transition()
+                .duration(150)
+                .attr("r", 6)
+            })
+            .on("mouseleave", function () {
+                d3.select(this)
+                    .transition()
+                    .duration(150)
+                    .attr("r", 5)
+                    .attr('fill', d => d.color)
+                    .attr('stroke', 'black')
+            })
+            .on('click', (event, d) => {
+                // Only update the Ian viewer timestamp
+                const idx = IAN_TIMESTAMPS.indexOf(d);
+                setIanTimestamp(idx);
+            });
+
+            const irmaTrack = stormGroup.append('g')
+            .attr('class', 'irma-track')
+            .style('display', 'none');
+
+            irmaTrack.selectAll('circle')
+            .data(IRMA_TIMESTAMPS)
+            .enter()
+            .append('circle')
+            .attr('class', 'irma-timestamp')
+            .attr('r', 5)
+            .attr('fill', d => d.color)
+            .attr('stroke', 'black')
+            .attr('transform', d => {
+                const [x, y] = projection([d.lon, d.lat]);
+                return `translate(${x}, ${y})`;
+            })
+            .on("mouseenter", function () {
+                d3.select(this)
+                .transition()
+                .duration(150)
+                .attr("r", 6)
+            })
+            .on("mouseleave", function () {
+                d3.select(this)
+                    .transition()
+                    .duration(150)
+                    .attr("r", 5)
+                    .attr('fill', d => d.color)
+                    .attr('stroke', 'black')
+            })
+            .on('click', (event, d) => {
+                // Only update the Irma viewer timestamp
+                const idx = IRMA_TIMESTAMPS.indexOf(d);
+                setIrmaTimestamp(idx);
+            });
+
+            const idaTrack = stormGroup.append('g')
+            .attr('class', 'ida-track')
+            .style('display', 'none');
+
+            idaTrack.selectAll('circle')
+            .data(IDA_TIMESTAMPS)
+            .enter()
+            .append('circle')
+            .attr('class', 'ida-timestamp')
+            .attr('r', 5)
+            .attr('fill', d => d.color)
+            .attr('stroke', 'black')
+            .attr('transform', d => {
+                const [x, y] = projection([d.lon, d.lat]);
+                return `translate(${x}, ${y})`;
+            })
+            .on("mouseenter", function (event, d) {
+                d3.select(this)
+                .transition()
+                .duration(150)
+                .attr("r", 6)
+            })
+            .on("mouseleave", function (event, d) {
+                d3.select(this)
+                    .transition()
+                    .duration(150)
+                    .attr("r", 5)
+                    .attr('fill', d => d.color)
+                    .attr('stroke', 'black')
+            })
+            .on('click', (event, d) => {
+                // Only update the ida viewer timestamp
+                const idx = IDA_TIMESTAMPS.indexOf(d);
+                setIdaTimestamp(idx);
+            });
 
             isGlobeInitialized = true;
 
@@ -465,32 +525,110 @@ function createFallbackGlobe() {
 function zoomToStorm(storm) {
     console.log('=== zoomToStorm STARTED ===');
     console.log('Storm clicked:', storm);
-    console.log('Has projection?', !!projection);
-    console.log('Has svg?', !!svg);
-    console.log('Has zoom?', !!zoom);
 
     if (!projection || !svg || !zoom) {
         console.error('Missing required elements for zoom!');
         return;
     }
 
-    const [x, y] = projection([storm.lon || 0, storm.lat || 0]);
-    console.log('Projected coordinates:', { x, y });
-    console.log('Storm lon/lat:', { lon: storm.lon, lat: storm.lat });
+    // Get the bounds for THIS specific storm
+    let stormBounds;
+    let trackCoords;
+    
+    switch(storm.id) {
+        case 'ida':
+            stormBounds = idaBounds;
+            trackCoords = idaCoords;
+            break;
+        case 'harvey':
+            stormBounds = harveyBounds;
+            trackCoords = harveyCoords;
+            break;
+        case 'ian':
+            stormBounds = ianBounds;
+            trackCoords = ianCoords;
+            break;
+        case 'irma':
+            stormBounds = irmaBounds;
+            trackCoords = irmaCoords;
+            break;
+        default:
+            console.error('Unknown storm ID:', storm.id);
+            return;
+    }
 
-    const k = 4;
-    console.log('Zoom scale (k):', k);
+    console.log('Storm bounds:', stormBounds);
+    console.log('Track coordinates count:', trackCoords.length);
 
-    console.log('Starting zoom transition...');
+    // Calculate zoom to fit ALL track points
+    const [[minLon, minLat], [maxLon, maxLat]] = stormBounds;
+    
+    // Add padding to ensure all points are visible
+    const padding = 0.5; // degrees of padding
+    const paddedMinLon = minLon - padding;
+    const paddedMaxLon = maxLon + padding;
+    const paddedMinLat = minLat - padding;
+    const paddedMaxLat = maxLat + padding;
+    
+    console.log('Padded bounds:', [[paddedMinLon, paddedMinLat], [paddedMaxLon, paddedMaxLat]]);
 
+    // Calculate the center of the bounds
+    const centerLon = (paddedMinLon + paddedMaxLon) / 2;
+    const centerLat = (paddedMinLat + paddedMaxLat) / 2;
+    const center = projection([centerLon, centerLat]);
+    
+    console.log('Center coordinates:', { centerLon, centerLat, center });
+
+    // Calculate the scale needed to fit the bounds
+    const topLeft = projection([paddedMinLon, paddedMaxLat]);
+    const bottomRight = projection([paddedMaxLon, paddedMinLat]);
+    const boundsWidth = Math.abs(bottomRight[0] - topLeft[0]);
+    const boundsHeight = Math.abs(bottomRight[1] - topLeft[1]);
+    
+    console.log('Bounds dimensions:', { boundsWidth, boundsHeight });
+
+    // Calculate scale with margin
+    const margin = 0.2; // 20% margin
+    const scale = Math.min(
+        (width * (1 - margin)) / boundsWidth,
+        (height * (1 - margin)) / boundsHeight
+    );
+    
+    console.log('Calculated scale:', scale);
+
+    // Show the track immediately
+    d3.select(`.${storm.id}-track`).style('display', 'block');
+    
+    // Hide all other tracks
+    d3.selectAll('.harvey-track, .ian-track, .ida-track, .irma-track')
+        .filter(function() {
+            return !d3.select(this).classed(`${storm.id}-track`);
+        })
+        .style('display', 'none');
+
+    // Hide all viewers first
+    d3.selectAll('.viewer-panel').classed('hidden', true);
+    
+    // Show the target viewer
+    const targetViewer = d3.select(`#${storm.id}-viewer`);
+    if (!targetViewer.empty()) {
+        targetViewer.classed('hidden', false);
+    }
+
+    // Dim the globe
+    d3.select('#globe').style('opacity', 1);
+
+    console.log('Starting single zoom transition to bounds...');
+
+    // SINGLE zoom transition to fit the bounds
     svg.transition()
-        .duration(750)
+        .duration(1000)
         .call(
             zoom.transform,
             d3.zoomIdentity
                 .translate(width / 2, height / 2)
-                .scale(k)
-                .translate(-x, -y)
+                .scale(scale)
+                .translate(-center[0], -center[1])
         )
         .on('start', () => {
             console.log('Zoom transition started');
@@ -499,66 +637,26 @@ function zoomToStorm(storm) {
             console.log('Zoom transition interrupted');
         })
         .on('end', () => {
-            console.log('=== Zoom transition ENDED ===');
-            console.log('Now showing viewer for:', storm.id);
+            console.log('=== Zoom transition COMPLETE ===');
+            console.log('Now initializing viewer for:', storm.id);
 
-            // Log viewer elements before hiding
-            const viewers = d3.selectAll('.viewer-panel');
-            console.log('Total viewer panels found:', viewers.size());
-            viewers.each(function (d, i) {
-                const el = d3.select(this);
-                console.log(`Viewer ${i}: id=${el.attr('id')}, hidden=${el.classed('hidden')}`);
-            });
-
-            // hide all viewers
-            d3.selectAll('.viewer-panel').classed('hidden', true);
-            console.log('All viewers hidden');
-
-            // show current viewer and dim globe
-            const targetViewer = d3.select(`#${storm.id}-viewer`);
-            console.log('Target viewer element:', targetViewer.node());
-
-            if (targetViewer.empty()) {
-                console.error(`Viewer #${storm.id}-viewer not found!`);
-                console.log('Available viewer IDs:');
-                d3.selectAll('.viewer-panel').each(function () {
-                    console.log('-', d3.select(this).attr('id'));
-                });
-            } else {
-                targetViewer.classed('hidden', false);
-                console.log(`Viewer ${storm.id} shown (hidden=${targetViewer.classed('hidden')})`);
-                if (targetViewer.style('display') === 'none') {
-                console.warn(`Panel is visible via JS class removal, but CSS display is still 'none'. Check .viewer-panel.hidden CSS rule.`);
-            }
+            // Initialize the specific viewer
+            switch(storm.id) {
+                case 'ida':
+                    initializeIdaViewer(0); // Start at first timestamp
+                    break;
+                case 'harvey':
+                    initializeHarveyViewer(0);
+                    break;
+                case 'ian':
+                    initializeIanViewer(0);
+                    break;
+                case 'irma':
+                    initializeIrmaViewer(0);
+                    break;
             }
 
-            // Check globe opacity
-            const globe = d3.select('#globe');
-            console.log('Globe element:', globe.node());
-            globe.style('opacity', 0.5);
-            console.log('Globe opacity set to 0.5');
-
-            // Log which viewer function will be called
-            console.log('Calling viewer initialization function for:', storm.id);
-
-            // initialize specific viewer content
-            if (storm.id === 'ida') {
-                console.log('Calling initializeIdaViewer()...');
-                initializeIdaViewer();
-            } else if (storm.id === 'harvey') {
-                console.log('Calling initializeHarveyViewer()...');
-                initializeHarveyViewer();
-            } else if (storm.id === 'ian') {
-                console.log('Calling initializeIanViewer()...');
-                initializeIanViewer();
-            } else if (storm.id === 'irma') {
-                console.log('Calling initializeIrmaViewer()...');
-                initializeIrmaViewer();
-            } else {
-                console.error('Unknown storm ID:', storm.id);
-            }
-
-            console.log('=== zoomToStorm COMPLETE ===');
+            console.log('=== zoomToStorm FINISHED ===');
         });
 }
 
@@ -566,6 +664,15 @@ function resetZoom() {
     // hide all viewers
     d3.selectAll('.viewer-panel').classed('hidden', true);
     d3.select('#globe').style('opacity', 1);
+
+    d3.select('.harvey-track').style('display', 'none');
+    d3.select('.storm-harvey').style('display', 'block');
+    d3.select('.ian-track').style('display', 'none');
+    d3.select('.storm-ian').style('display', 'block');
+    d3.select('.ida-track').style('display', 'none');
+    d3.select('.storm-ida').style('display', 'block');
+    d3.select('.irma-track').style('display', 'none');
+    d3.select('.storm-irma').style('display', 'block');
 
     // Reset zoom
     if (svg && zoom) {
@@ -577,51 +684,22 @@ function resetZoom() {
 
 export function onExitClickHurricanes() {
     console.log('Exiting Click Hurricanes section');
+    d3.select('#globe-svg').remove();
     d3.select('#storm-tooltip').remove();
+    d3.selectAll('.viewer-panel').classed('hidden', true);
+    svg = null;
+    projection = null;
+    zoom = null;
+    isGlobeInitialized = false;
     resetZoom();
 }
 
 export function onProgressClickHurricanes(progress) {
-    if (isGlobeInitialized && progress > 0.1 && stormGroup && projection && svg) {
-        // Simple globe rotation (note: this logic is complex for Natural Earth projection 
-        // but is retained/slightly simplified based on your original)
-
-        // Calculate the rotation angle based on scroll progress
-        const rotationAngle = progress * 30;
-
-        // Calculate the new translation required to visually represent rotation
-        // This is not a proper D3 projection rotation, but a transformation on the group
-
-        stormGroup.selectAll('circle')
-            .transition()
-            .duration(500)
-            .attr('transform', d => {
-                // Get the original projected coordinates
-                const [x, y] = projection([d.lon, d.lat]);
-
-                // Rotation logic is complex on non-rotated projections; 
-                // for simplicity, we'll just slightly adjust the projection center:
-                const newProjection = d3.geoNaturalEarth1()
-                    .center([-82 + rotationAngle * 0.1, 27]) // Rotate Westward slightly
-                    .scale(width * 1.3)
-                    .translate([width / 2, height / 2]);
-
-                const [newX, newY] = newProjection([d.lon, d.lat]);
-
-                return `translate(${newX}, ${newY})`;
-            });
-
-        // Apply the same transformation to the labels
-        stormGroup.selectAll('text')
-            .transition()
-            .duration(500)
-            .attr('transform', d => {
-                const newProjection = d3.geoNaturalEarth1()
-                    .center([-82 + rotationAngle * 0.1, 27])
-                    .scale(width * 1.3)
-                    .translate([width / 2, height / 2]);
-                const [newX, newY] = newProjection([d.lon, d.lat]);
-                return `translate(${newX}, ${newY - 15})`;
-            });
-    }
+    if (!isGlobeInitialized || !stormGroup) return;
+    
+    // Reset to original positions
+    stormGroup.selectAll('circle.storm')
+        .attr('transform', d => {
+            return `translate(${d.originalX || 0}, ${d.originalY || 0})`;
+        });
 }

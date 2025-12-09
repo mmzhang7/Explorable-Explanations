@@ -14,25 +14,31 @@ const GLOBAL_BOUNDS_GEOJSON = {
         ]]
     }
 };
+let currentIndex = 0;
 
 // fast '_sampled.csv' files (sampled 1/3)
 const IDA_FILES = [
-  './data/ida_20210828_06Z_sampled.csv', './data/ida_20210828_09Z_sampled.csv', './data/ida_20210828_12Z_sampled.csv', 
-  './data/ida_20210828_15Z_sampled.csv', './data/ida_20210828_18Z_sampled.csv', './data/ida_20210828_21Z_sampled.csv',
-  './data/ida_20210829_00Z_sampled.csv', './data/ida_20210829_03Z_sampled.csv', './data/ida_20210829_06Z_sampled.csv', 
-  './data/ida_20210829_09Z_sampled.csv', './data/ida_20210829_12Z_sampled.csv', './data/ida_20210829_15Z_sampled.csv', 
-  './data/ida_20210829_18Z_sampled.csv', './data/ida_20210829_21Z_sampled.csv', './data/ida_20210830_00Z_sampled.csv', 
-  './data/ida_20210830_03Z_sampled.csv'
+  './data/ida_20210827_18Z_sampled.csv', './data/ida_20210827_23Z_sampled.csv', './data/ida_20210828_00Z_sampled.csv', 
+  './data/ida_20210828_06Z_sampled.csv', './data/ida_20210828_12Z_sampled.csv', './data/ida_20210828_18Z_sampled.csv',
+  './data/ida_20210829_00Z_sampled.csv', './data/ida_20210829_06Z_sampled.csv', './data/ida_20210829_12Z_sampled.csv',
+  './data/ida_20210829_16Z_sampled.csv', './data/ida_20210829_18Z_sampled.csv', './data/ida_20210830_00Z_sampled.csv', 
+  './data/ida_20210830_06Z_sampled.csv'
 ];
-
-/*const IDA_FILES = [
-  'data/ida_cloudprops_bt_20210828_06Z_sampled.csv', 'data/ida_cloudprops_bt_20210828_09Z_sampled.csv', 'data/ida_cloudprops_bt_20210828_12Z_sampled.csv', 
-  'data/ida_cloudprops_bt_20210828_15Z_sampled.csv', 'data/ida_cloudprops_bt_20210828_18Z_sampled.csv', 'data/ida_cloudprops_bt_20210828_21Z_sampled.csv',
-  'data/ida_cloudprops_bt_20210829_00Z_sampled.csv', 'data/ida_cloudprops_bt_20210829_03Z_sampled.csv', 'data/ida_cloudprops_bt_20210829_06Z_sampled.csv', 
-  'data/ida_cloudprops_bt_20210829_09Z_sampled.csv', 'data/ida_cloudprops_bt_20210829_12Z_sampled.csv', 'data/ida_cloudprops_bt_20210829_15Z_sampled.csv', 
-  'data/ida_cloudprops_bt_20210829_18Z_sampled.csv', 'data/ida_cloudprops_bt_20210829_21Z_sampled.csv', 'data/ida_cloudprops_bt_20210830_00Z_sampled.csv', 
-  'data/ida_cloudprops_bt_20210830_03Z_sampled.csv'
-];*/
+const IDA_TIMESTAMPS = [
+  { file: './data/ida_20210827_18Z_sampled.csv', lat: 21.5076, lon: -82.6180, color: 'yellow' },
+  { file: './data/ida_20210827_23Z_sampled.csv', lat: 22.4274, lon: -83.2202, color: 'yellow' },
+  { file: './data/ida_20210828_00Z_sampled.csv', lat: 22.6019, lon: -83.5154, color: 'yellow' },
+  { file: './data/ida_20210828_06Z_sampled.csv', lat: 23.5036, lon: -84.6960, color: 'yellow' },
+  { file: './data/ida_20210828_12Z_sampled.csv', lat: 24.4314, lon: -85.7114, color: 'yellow' },
+  { file: './data/ida_20210828_18Z_sampled.csv', lat: 25.6026, lon: -86.6013, color: 'yellow' },
+  { file: './data/ida_20210829_00Z_sampled.csv', lat: 26.7153, lon: -87.6048, color: 'orange' },
+  { file: './data/ida_20210829_06Z_sampled.csv', lat: 27.6082, lon: -88.7029, color: 'magenta' },
+  { file: './data/ida_20210829_12Z_sampled.csv', lat: 28.5055, lon: -89.6031, color: 'magenta' },
+  { file: './data/ida_20210829_16Z_sampled.csv', lat: 29.0850, lon: -90.2170, color: 'magenta' },
+  { file: './data/ida_20210829_18Z_sampled.csv', lat: 29.2293, lon: -90.4059, color: 'magenta' },
+  { file: './data/ida_20210830_00Z_sampled.csv', lat: 29.9071, lon: -90.6185, color: 'red' },
+  { file: './data/ida_20210830_06Z_sampled.csv', lat: 30.6006, lon: -90.8074, color: 'yellow' }
+];
 
 const dataCache = {};
 const viewerId = '#ida-viewer';
@@ -116,7 +122,7 @@ function resetAnimation() {
 }
 
 // Viz/UI
-function createViewerUI() {
+function createViewerUI(initialIndex = 0) {
   const container = d3.select(viewerId);
 
   container.html('');
@@ -150,11 +156,12 @@ function createViewerUI() {
     .attr('id', 'timestamp-slider')
     .attr('min', 0)
     .attr('max', IDA_FILES.length - 1)
-    .attr('value', 0)
+    .attr('value', initialIndex)      // set initial UI value
     .attr('step', 1)
-    .on('input', function() {
+    .on('change', function() {
       stopAnimation();
-      updateViewer(+this.value);
+      currentIndex = +this.value;
+      updateViewer(currentIndex);
     });
 
   // 3. Canvas Container 
@@ -176,7 +183,8 @@ function createViewerUI() {
   colorScale = d3.scaleSequential(d3.interpolateYlOrRd).domain([200, 300]);
 
   viewerReady = true;
-  updateViewer(0);
+  currentIndex = initialIndex;
+  updateViewer(initialIndex);
 }
 
 /**
@@ -190,12 +198,13 @@ function updateViewer(fileIndex) {
   const data = dataCache[fileName]; 
 
   if (!data || data.length === 0) {
-    timestampLabel.text(`Timestamp: ${fileName.replace('.csv', '')} - (No Data Available)`);
-    ctx.clearRect(0, 0, width, height); 
-    return;
+      timestampLabel.text(`Timestamp: ${fileName.replace('.csv', '')} - (No Data Available)`);
+      ctx.clearRect(0, 0, width, height); 
+      return;
   }
   
-  let displayTime = '(unknown)';
+  let displayTime = "(unknown)";
+
   const match = fileName.match(/ida_(\d{4})(\d{2})(\d{2})_(\d{2})Z/);
   if (match) {
     const [_, YYYY, MM, DD, HH] = match;
@@ -216,18 +225,32 @@ function updateViewer(fileIndex) {
     ctx.fillStyle = colorScale(d.CMI);
     ctx.fillRect(x - POINT_SIZE / 2, y - POINT_SIZE / 2, POINT_SIZE, POINT_SIZE);
   }
+
+  timestampLabel.text(`Timestamp: ${displayTime}`);
 }
 
+export async function initializeIdaViewer(initialIndex = 0) {
+  // if already initialized, don't re-create UI — just set the timestamp
+  if (viewerReady) {
+    // viewer already exists; just show and set timestamp
+    d3.select(viewerId).classed('hidden', false);
+    setIdaTimestamp(initialIndex);
+    return;
+  }
 
-export async function initializeIdaViewer() {
-   console.log('=== initializeIdaViewer STARTED ===');
-  console.log('IDA Viewer container:', d3.select('#ida-viewer').node());
   const loadSuccess = await loadData();
 
   if (loadSuccess) {
-    createViewerUI();
+    createViewerUI(initialIndex);
   } else {
     d3.select(viewerId).html('<p>Error: Could not load all Hurricane Ida data files. Check file paths and accessibility.</p>');
   }
-  console.log('=== initializeIdaViewer COMPLETED ===');
 }
+
+export function setIdaTimestamp(index) {
+  d3.select('#timestamp-slider').property('value', index);
+  stopAnimation();
+  updateViewer(index);
+}
+
+export { IDA_TIMESTAMPS };

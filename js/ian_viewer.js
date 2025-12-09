@@ -6,23 +6,42 @@ const GLOBAL_BOUNDS_GEOJSON = {
     "geometry": {
         "type": "Polygon",
         "coordinates": [[
-            [-90, 18],
-            [-90, 40],
-            [-71, 40],
-            [-71, 18],
-            [-90, 18]
+            [-90, 20],
+            [-90, 42],
+            [-71, 42],
+            [-71, 20],
+            [-90, 20]
         ]]
     }
 };
+let currentIndex = 0;
 
 // fast '_sampled.csv' files (sampled 1/3)
 const IAN_FILES = [
-  '../data/ian_20220926_12Z_sampled.csv', '../data/ian_20220926_18Z_sampled.csv', '../data/ian_20220927_00Z_sampled.csv', 
-  '../data/ian_20220927_06Z_sampled.csv', '../data/ian_20220927_12Z_sampled.csv', '../data/ian_20220927_18Z_sampled.csv',
-  '../data/ian_20220928_00Z_sampled.csv', '../data/ian_20220928_03Z_sampled.csv', '../data/ian_20220928_06Z_sampled.csv', 
-  '../data/ian_20220928_09Z_sampled.csv', '../data/ian_20220928_12Z_sampled.csv', '../data/ian_20220928_15Z_sampled.csv', 
-  '../data/ian_20220928_18Z_sampled.csv', '../data/ian_20220928_21Z_sampled.csv', '../data/ian_20220929_00Z_sampled.csv', 
-  '../data/ian_20220929_06Z_sampled.csv'
+  './data/ian_20220927_06Z_sampled.csv', './data/ian_20220927_08Z_sampled.csv', './data/ian_20220927_12Z_sampled.csv',
+  './data/ian_20220927_18Z_sampled.csv', './data/ian_20220928_00Z_sampled.csv', './data/ian_20220928_02Z_sampled.csv', 
+  './data/ian_20220928_06Z_sampled.csv', './data/ian_20220928_12Z_sampled.csv', './data/ian_20220928_18Z_sampled.csv', 
+  './data/ian_20220928_19Z_sampled.csv', './data/ian_20220928_20Z_sampled.csv', './data/ian_20220929_00Z_sampled.csv', 
+  './data/ian_20220929_06Z_sampled.csv', './data/ian_20220929_12Z_sampled.csv'
+];
+const IAN_TIMESTAMPS = [
+  
+  { file: './data/ian_20220927_06Z_sampled.csv', lat: 21.7813, lon: -83.4997, color: 'red' },
+  { file: './data/ian_20220927_08Z_sampled.csv', lat: 22.2059, lon: -83.6443, color: 'red' },
+  { file: './data/ian_20220927_12Z_sampled.csv', lat: 22.5847, lon: -83.5720, color: 'red' },
+  { file: './data/ian_20220927_18Z_sampled.csv', lat: 23.5382, lon: -83.3310, color: 'red' },
+
+  { file: './data/ian_20220928_00Z_sampled.csv', lat: 24.3312, lon: -83.1141, color: 'red' },
+  { file: './data/ian_20220928_02Z_sampled.csv', lat: 24.5944, lon: -83.0659, color: 'red' },
+  { file: './data/ian_20220928_06Z_sampled.csv', lat: 25.1629, lon: -83.0418, color: 'magenta' },
+  { file: './data/ian_20220928_12Z_sampled.csv', lat: 25.9456, lon: -82.9454, color: 'purple' },
+  { file: './data/ian_20220928_18Z_sampled.csv', lat: 26.5724, lon: -82.7044, color: 'magenta' },
+  { file: './data/ian_20220928_19Z_sampled.csv', lat: 26.7016, lon: -82.5116, color: 'magenta' },
+  { file: './data/ian_20220928_20Z_sampled.csv', lat: 26.8092, lon: -82.4152, color: 'magenta' },
+
+  { file: './data/ian_20220929_00Z_sampled.csv', lat: 27.1529, lon: -82.2224, color: 'red' },
+  { file: './data/ian_20220929_06Z_sampled.csv', lat: 27.6877, lon: -81.0404, color: 'yellow' },
+  { file: './data/ian_20220929_12Z_sampled.csv', lat: 28.3912, lon: -80.5218, color: 'green' }
 ];
 
 const dataCache = {};
@@ -107,7 +126,7 @@ function resetAnimation() {
 }
 
 // Viz/UI
-function createViewerUI() {
+function createViewerUI(initialIndex = 0) {
   const container = d3.select(viewerId);
 
   container.html('');
@@ -141,11 +160,12 @@ function createViewerUI() {
     .attr('id', 'timestamp-slider')
     .attr('min', 0)
     .attr('max', IAN_FILES.length - 1)
-    .attr('value', 0)
+    .attr('value', initialIndex)      // set initial UI value
     .attr('step', 1)
-    .on('input', function() {
+    .on('change', function() {
       stopAnimation();
-      updateViewer(+this.value);
+      currentIndex = +this.value;
+      updateViewer(currentIndex);
     });
 
   // 3. Canvas Container 
@@ -167,7 +187,8 @@ function createViewerUI() {
   colorScale = d3.scaleSequential(d3.interpolateYlOrRd).domain([200, 300]);
 
   viewerReady = true;
-  updateViewer(0);
+  currentIndex = initialIndex;
+  updateViewer(initialIndex);
 }
 
 /**
@@ -175,49 +196,68 @@ function createViewerUI() {
  */
 
 function updateViewer(fileIndex) {
-    if (!viewerReady) return;
+  if (!viewerReady) return;
 
-    const fileName = IAN_FILES[fileIndex];
-    const data = dataCache[fileName]; 
+  const fileName = IAN_FILES[fileIndex];
+  const data = dataCache[fileName]; 
 
-    if (!data || data.length === 0) {
-        timestampLabel.text(`Timestamp: ${fileName.replace('.csv', '')} - (No Data Available)`);
-        ctx.clearRect(0, 0, width, height); 
-        return;
-    }
+  if (!data || data.length === 0) {
+      timestampLabel.text(`Timestamp: ${fileName.replace('.csv', '')} - (No Data Available)`);
+      ctx.clearRect(0, 0, width, height); 
+      return;
+  }
+  
+  let displayTime = "(unknown)";
+
+  const match = fileName.match(/ian_(\d{4})(\d{2})(\d{2})_(\d{2})Z/);
+  if (match) {
+    const [_, YYYY, MM, DD, HH] = match;
+    displayTime = `${MM}/${DD}/${YYYY} ${HH}:00`;
+  }
+
+  timestampLabel.text(`Timestamp: ${displayTime}`);
+
+  
+  // Clear Canvas 
+  ctx.clearRect(0, 0, width, height);
+  
+  // Draw Heatmap Points
+  ctx.globalAlpha = 0.5;
+
+  for (const d of data) {
+    const [x, y] = ianProjection([d.lon, d.lat]);
     
-    const match = fileName.match(/ian_(\d{4})(\d{2})(\d{2})_(\d{2})Z/);
-    if (match) {
-        const [_, YYYY, MM, DD, HH] = match;
-        const displayTime = `${MM}/${DD}/${YYYY} ${HH}:00`;
-        timestampLabel.text(`Timestamp: ${displayTime}`); 
-    } else {
-        timestampLabel.text(`Timestamp: (unknown)`);
-    }
+    if (x < 0 || x > width || y < 0 || y > height) continue;
 
-    
-    // Clear Canvas 
-    ctx.clearRect(0, 0, width, height);
-    
-    // Draw Heatmap Points 
-    ctx.globalAlpha = 0.5;
+    ctx.fillStyle = colorScale(d.CMI);
+    ctx.fillRect(x - POINT_SIZE / 2, y - POINT_SIZE / 2, POINT_SIZE, POINT_SIZE);
+  }
 
-    for (const d of data) {
-        const [x, y] = projection([d.lon, d.lat]);
-        
-        if (x < 0 || x > width || y < 0 || y > height) continue;
-
-        ctx.fillStyle = colorScale(d.CMI);
-        ctx.fillRect(x - POINT_SIZE / 2, y - POINT_SIZE / 2, POINT_SIZE, POINT_SIZE);
-    } 
+  timestampLabel.text(`Timestamp: ${displayTime}`);
 }
 
-export async function initializeIanViewer() {
+export async function initializeIanViewer(initialIndex = 0) {
+  // if already initialized, don't re-create UI — just set the timestamp
+  if (viewerReady) {
+    // viewer already exists; just show and set timestamp
+    d3.select(viewerId).classed('hidden', false);
+    setIanTimestamp(initialIndex);
+    return;
+  }
+
   const loadSuccess = await loadData();
 
   if (loadSuccess) {
-    createViewerUI();
+    createViewerUI(initialIndex);
   } else {
     d3.select(viewerId).html('<p>Error: Could not load all Hurricane Ian data files. Check file paths and accessibility.</p>');
   }
 }
+
+export function setIanTimestamp(index) {
+  d3.select('#timestamp-slider').property('value', index);
+  stopAnimation();
+  updateViewer(index);
+}
+
+export { IAN_TIMESTAMPS };

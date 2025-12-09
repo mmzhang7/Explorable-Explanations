@@ -6,24 +6,46 @@ const GLOBAL_BOUNDS_GEOJSON = {
     "geometry": {
         "type": "Polygon",
         "coordinates": [[
-            [-65, 12],
-            [-65, 30],
-            [-65, 30],
-            [-45, 12],
-            [-65, 12]
+            [-82, 18],
+            [-82, 30],
+            [-82, 30],
+            [-60, 18],
+            [-82, 18]
         ]]
     }
 };
+let currentIndex = 0;
 
 // fast '_sampled.csv' files (sampled 1/3)
 const IRMA_FILES = [
-  './data/irma_20170905_00Z_sampled.csv', './data/irma_20170905_06Z_sampled.csv', './data/irma_20170905_12Z_sampled.csv', 
-  './data/irma_20170905_18Z_sampled.csv', './data/irma_20170906_00Z_sampled.csv', './data/irma_20170906_03Z_sampled.csv',
-  './data/irma_20170906_06Z_sampled.csv', './data/irma_20170906_09Z_sampled.csv', './data/irma_20170906_12Z_sampled.csv', 
-  './data/irma_20170906_18Z_sampled.csv', './data/irma_20170906_21Z_sampled.csv', 
-  './data/irma_20170907_00Z_sampled.csv', './data/irma_20170907_03Z_sampled.csv', './data/irma_20170907_06Z_sampled.csv', 
-  './data/irma_20170907_09Z_sampled.csv'
+  './data/irma_20170907_12Z_sampled.csv', './data/irma_20170907_18Z_sampled.csv', './data/irma_20170908_00Z_sampled.csv', 
+  './data/irma_20170908_05Z_sampled.csv', './data/irma_20170908_06Z_sampled.csv', './data/irma_20170908_12Z_sampled.csv', 
+  './data/irma_20170908_18Z_sampled.csv', './data/irma_20170909_00Z_sampled.csv', './data/irma_20170909_03Z_sampled.csv', 
+  './data/irma_20170909_06Z_sampled.csv', './data/irma_20170909_12Z_sampled.csv', './data/irma_20170909_18Z_sampled.csv', 
+  './data/irma_20170910_00Z_sampled.csv', './data/irma_20170910_06Z_sampled.csv', './data/irma_20170910_12Z_sampled.csv', 
+  './data/irma_20170910_13Z_sampled.csv'
+  
 ];
+
+const IRMA_TIMESTAMPS = [
+  { file: './data/irma_20170907_12Z_sampled.csv', lat: 20.1980, lon: -68.9962, color: 'purple' },
+  { file: './data/irma_20170907_18Z_sampled.csv', lat: 20.6895, lon: -70.4136, color: 'purple' },
+  { file: './data/irma_20170908_00Z_sampled.csv', lat: 21.1274, lon: -71.8198, color: 'purple' },
+  { file: './data/irma_20170908_05Z_sampled.csv', lat: 21.1274, lon: -71.8198, color: 'magenta' },
+  { file: './data/irma_20170908_06Z_sampled.csv', lat: 21.1274, lon: -71.8198, color: 'magenta' },
+  { file: './data/irma_20170908_12Z_sampled.csv', lat: 21.1274, lon: -71.8198, color: 'magenta' },
+  { file: './data/irma_20170908_18Z_sampled.csv', lat: 21.5121, lon: -73.0139, color: 'purple' },
+  { file: './data/irma_20170909_00Z_sampled.csv', lat: 21.5121, lon: -73.2036, color: 'purple' },
+  { file: './data/irma_20170909_03Z_sampled.csv', lat: 21.8336, lon: -74.7103, color: 'purple' },
+  { file: './data/irma_20170909_06Z_sampled.csv', lat: 22.0406, lon: -76.0049, color: 'magenta' },
+  { file: './data/irma_20170909_12Z_sampled.csv', lat: 22.7217, lon: -79.3077, color: 'red' },
+  { file: './data/irma_20170909_18Z_sampled.csv', lat: 23.1123, lon: -80.2117, color: 'orange' },
+  { file: './data/irma_20170910_00Z_sampled.csv', lat: 23.4302, lon: -80.9148, color: 'red' },
+  { file: './data/irma_20170910_06Z_sampled.csv', lat: 23.7034, lon: -81.3054, color: 'magenta' },
+  { file: './data/irma_20170910_12Z_sampled.csv', lat: 24.5213, lon: -81.5063, color: 'magenta' },
+  { file: './data/irma_20170910_13Z_sampled.csv', lat: 24.7140, lon: -81.5063, color: 'magenta' }
+];
+
 
 const dataCache = {};
 const viewerId = '#irma-viewer';
@@ -107,7 +129,7 @@ function resetAnimation() {
 }
 
 // Viz/UI
-function createViewerUI() {
+function createViewerUI(initialIndex = 0) {
   const container = d3.select(viewerId);
 
   container.html('');
@@ -141,11 +163,12 @@ function createViewerUI() {
     .attr('id', 'timestamp-slider')
     .attr('min', 0)
     .attr('max', IRMA_FILES.length - 1)
-    .attr('value', 0)
+    .attr('value', initialIndex)      // set initial UI value
     .attr('step', 1)
-    .on('input', function() {
+    .on('change', function() {
       stopAnimation();
-      updateViewer(+this.value);
+      currentIndex = +this.value;
+      updateViewer(currentIndex);
     });
 
   // 3. Canvas Container 
@@ -167,7 +190,8 @@ function createViewerUI() {
   colorScale = d3.scaleSequential(d3.interpolateYlOrRd).domain([200, 300]);
 
   viewerReady = true;
-  updateViewer(0);
+  currentIndex = initialIndex;
+  updateViewer(initialIndex);
 }
 
 /**
@@ -186,13 +210,15 @@ function updateViewer(fileIndex) {
       return;
   }
   
-  const baseName = fileName.replace('_sampled.csv', '').replace('irma_', '');
-  const YYYY = baseName.substring(0, 4);
-  const MM = baseName.substring(4, 6);
-  const DD = baseName.substring(6, 8);
-  const HH = baseName.substring(9, 11); 
+  let displayTime = "(unknown)";
 
-  const displayTime = `${MM}/${DD}/${YYYY} ${HH}:00`;
+  const match = fileName.match(/irma_(\d{4})(\d{2})(\d{2})_(\d{2})Z/);
+  if (match) {
+    const [_, YYYY, MM, DD, HH] = match;
+    displayTime = `${MM}/${DD}/${YYYY} ${HH}:00`;
+  }
+
+  timestampLabel.text(`Timestamp: ${displayTime}`);
 
   
   // Clear Canvas 
@@ -213,12 +239,28 @@ function updateViewer(fileIndex) {
   timestampLabel.text(`Timestamp: ${displayTime}`);
 }
 
-export async function initializeIrmaViewer() {
+export async function initializeIrmaViewer(initialIndex = 0) {
+  // if already initialized, don't re-create UI — just set the timestamp
+  if (viewerReady) {
+    // viewer already exists; just show and set timestamp
+    d3.select(viewerId).classed('hidden', false);
+    setIrmaTimestamp(initialIndex);
+    return;
+  }
+
   const loadSuccess = await loadData();
 
   if (loadSuccess) {
-    createViewerUI();
+    createViewerUI(initialIndex);
   } else {
     d3.select(viewerId).html('<p>Error: Could not load all Hurricane Irma data files. Check file paths and accessibility.</p>');
   }
 }
+
+export function setIrmaTimestamp(index) {
+  d3.select('#timestamp-slider').property('value', index);
+  stopAnimation();
+  updateViewer(index);
+}
+
+export { IRMA_TIMESTAMPS };
