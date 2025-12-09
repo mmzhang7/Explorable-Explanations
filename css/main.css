@@ -296,7 +296,7 @@ header p {
 
 /* Individual Viewer Panels (Content injected via JS) */
 .viewer-panel {
-    background: rgba(255, 255, 255, 0.95);
+    background: #0d1b2a;
     padding: 15px;
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.3);
@@ -360,6 +360,49 @@ header p {
 #city-details,
 #action-details {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Legend */
+/* Hurricane Legend */
+.hurricane-legend {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 12px;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    z-index: 1000;
+    display: none;
+    font-size: 13px;
+    max-width: 220px;
+}
+
+.hurricane-legend h4 {
+    margin: 0 0 8px 0;
+    font-size: 14px;
+    color: #333;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 6px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.legend-color {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    margin-right: 8px;
+    border: 2px solid white;
+}
+
+.legend-label {
+    color: #444;
 }
 
 /* --- SECTION 5: DESTRUCTIVE TRENDS STYLES --- */
@@ -793,4 +836,29 @@ header p {
 
 .sandy-insight-box strong {
     color: #e74c3c;
+}
+
+.full-screen-text {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0 2rem;
+    text-align: center;
+}
+
+.full-screen-text h1 {
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 800;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+}
+
+.full-screen-text h2 {
+    font-size: clamp(1.25rem, 2vw, 2rem);
+    font-weight: 400;
+    max-width: 800px;
+    line-height: 1.4;
+    opacity: 0.85;
 }
