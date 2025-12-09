@@ -374,8 +374,14 @@ function updateCategoryDisplay(wind, category) {
            .style('border-color', category.color);
     
     nameDiv.text(category.name === 'Tropical Storm' ? 'Tropical Storm' : category.name + ' Hurricane');
-    rangeDiv.text(`Wind Speed Range: ${category.windSpeed[0]}-${category.windSpeed[1]} mph`);
-}
+    rangeDiv.text(
+        `Wind Speed Range: ${
+            category.name === 'Category 5'
+                ? '157+'
+                : `${category.windSpeed[0]}-${category.windSpeed[1]}`
+        } mph`
+    );
+    }
 
 function updateInfoPanel(category, wind) {
     const panel = d3.select('#hurricane-info');
