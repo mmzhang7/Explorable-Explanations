@@ -35,53 +35,53 @@ export function onEnterPreparednessAction() {
     const impactContainer = container.append('div')
         .attr('class', 'impact-container');
     
-    impactContainer.html(`
-        <h4>The Power of Preparedness</h4>
-        <div>
-            <div>
-                <div class="font-2em" style="color: #e74c3c">40%</div>
-                <div class="font-14px">Reduction in property damage with proper preparation</div>
-            </div>
-            <div>
-                <div class="font-2em" style="color: #3498db">60%</div>
-                <div class="font-14px">Faster recovery time for prepared communities</div>
-            </div>
-            <div>
-                <div class="font-2em" style="color: #2ecc71">90%</div>
-                <div class="font-14px">Evacuation compliance when communities are prepared</div>
-            </div>
-        </div>
-    `);
+    // impactContainer.html(`
+    //     <h4>The Power of Preparedness</h4>
+    //     <div>
+    //         <div>
+    //             <div class="font-2em" style="color: #e74c3c">40%</div>
+    //             <div class="font-14px">Reduction in property damage with proper preparation</div>
+    //         </div>
+    //         <div>
+    //             <div class="font-2em" style="color: #3498db">60%</div>
+    //             <div class="font-14px">Faster recovery time for prepared communities</div>
+    //         </div>
+    //         <div>
+    //             <div class="font-2em" style="color: #2ecc71">90%</div>
+    //             <div class="font-14px">Evacuation compliance when communities are prepared</div>
+    //         </div>
+    //     </div>
+    // `);
     
     // Add action steps grid (always visible, styles defined in CSS)
     const actionGrid = container.append('div')
         .attr('class', 'action-grid');
     
-    actionGrid.html(`
-        <h4>Five Key Action Steps</h4>
-        <div>
-            <div>
-                <div class="icon-24px">🏠</div>
-                <h5>Prepare Your Home</h5>
-                <p>Install storm shutters, reinforce roofs, clear drains and gutters</p>
-            </div>
-            <div>
-                <div class="icon-24px">📋</div>
-                <h5>Create Emergency Plan</h5>
-                <p>Know evacuation routes, have emergency supplies for 3+ days</p>
-            </div>
-            <div>
-                <div class="icon-24px">📱</div>
-                <h5>Stay Informed</h5>
-                <p>Monitor forecasts, heed evacuation orders, use weather apps</p>
-            </div>
-            <div>
-                <div class="icon-24px">👥</div>
-                <h5>Community Action</h5>
-                <p>Participate in disaster drills, check on neighbors, volunteer</p>
-            </div>
-        </div>
-    `);
+    // actionGrid.html(`
+    //     <h4>Five Key Action Steps</h4>
+    //     <div>
+    //         <div>
+    //             <div class="icon-24px">🏠</div>
+    //             <h5>Prepare Your Home</h5>
+    //             <p>Install storm shutters, reinforce roofs, clear drains and gutters</p>
+    //         </div>
+    //         <div>
+    //             <div class="icon-24px">📋</div>
+    //             <h5>Create Emergency Plan</h5>
+    //             <p>Know evacuation routes, have emergency supplies for 3+ days</p>
+    //         </div>
+    //         <div>
+    //             <div class="icon-24px">📱</div>
+    //             <h5>Stay Informed</h5>
+    //             <p>Monitor forecasts, heed evacuation orders, use weather apps</p>
+    //         </div>
+    //         <div>
+    //             <div class="icon-24px">👥</div>
+    //             <h5>Community Action</h5>
+    //             <p>Participate in disaster drills, check on neighbors, volunteer</p>
+    //         </div>
+    //     </div>
+    // `);
 }
 
 function createActionVisualization(width, height) {
