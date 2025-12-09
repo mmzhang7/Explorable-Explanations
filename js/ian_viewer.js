@@ -225,7 +225,7 @@ function updateViewer(fileIndex) {
   ctx.globalAlpha = 0.5;
 
   for (const d of data) {
-    const [x, y] = ianProjection([d.lon, d.lat]);
+    const [x, y] = projection([d.lon, d.lat]);
     
     if (x < 0 || x > width || y < 0 || y > height) continue;
 
