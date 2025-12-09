@@ -20,7 +20,7 @@ export function onEnterHurricaneSandy() {
         {
             title: '254',
             fact: 'Lives lost across multiple countries',
-            detail: 'Most deaths were in the US, with others in Canda and Caribbean nations'
+            detail: 'Most deaths were in the US, with others in Canada and Caribbean nations'
         },
         {
             title: 'Transportation Shutdown',
@@ -29,13 +29,13 @@ export function onEnterHurricaneSandy() {
         },
         {
             title: 'Unprepared Infrastructure',
-            fact: 'NYC had no storm surge barriers or adequate flood protection',
+            fact: 'NYC lacked storm surge barriers or adequate flood protection',
             detail: 'Critical systems were at sea level and vulnerable'
         },
         {
             title: 'Late Season Surprise',
             fact: 'October arrival caught many off-guard',
-            detail: 'Evacuation orders were delayed or ignored by residents'
+            detail: 'Despite evacuation orders, many residents underestimated the threat'
         },
     ];
     
