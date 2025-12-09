@@ -49,14 +49,17 @@ export function onEnterDestructiveTrends() {
         .attr('id', 'damage-svg')
         .attr('width', width)
         .attr('height', height)
-        .attr('viewBox', `0 0 ${width} ${height}`);
+        .attr('viewBox', `0 0 ${width} ${height}`)
+        .style('display', 'block')
+        .style('visibility', 'visible');
     
     trendSvg = vizContainer.append('svg')
         .attr('id', 'trend-svg')
         .attr('width', width)
         .attr('height', height)
         .attr('viewBox', `0 0 ${width} ${height}`)
-        .style('display', 'none');
+        .style('display', 'none')
+        .style('visibility', 'hidden');
     
     // Create damage visualization
     createDamageVisualization(width, height);
@@ -77,7 +80,7 @@ export function onEnterDestructiveTrends() {
             </div>
             <div>
                 <h5>Trend Analysis</h5>
-                <p>While total hurricane numbers are stable, **major hurricanes (Category 3+) are increasing** by 8% per decade.</p>
+                <p>In the last 100 years, the number of tropical storms has increased by <b>272%</b></p>
             </div>
             <div>
                 <h5>Climate Connection</h5>
@@ -103,11 +106,11 @@ function switchView(view) {
     
     // Show/hide visualizations
     if (view === 'damage') {
-        destructiveSvg.style('display', 'block');
-        trendSvg.style('display', 'none');
+        destructiveSvg.style('display', 'block').style('visibility', 'visible');
+        trendSvg.style('display', 'none').style('visibility', 'hidden');
     } else {
-        destructiveSvg.style('display', 'none');
-        trendSvg.style('display', 'block');
+        destructiveSvg.style('display', 'none').style('visibility', 'hidden');
+        trendSvg.style('display', 'block').style('visibility', 'visible');
     }
 }
 
@@ -275,207 +278,255 @@ function createDamageVisualization(width, height) {
 }
 
 function createTrendVisualization(width, height) {
-    // Generate trend data (1980-2022)
-    const years = d3.range(1980, 2023);
-    
-    // Base trend: increasing over time with climate change effect
-    const baseTrend = years.map(year => {
-        const base = 10 + (year - 1980) * 0.2; // Gradual increase
-        const variability = Math.random() * 5 - 2.5; // Random variation
-        const climateEffect = Math.max(0, (year - 2000) * 0.3); // Accelerated increase after 2000
-        return Math.max(5, base + variability + climateEffect);
-    });
-    
-    // Major hurricanes (Cat 3+) trend - increasing faster
-    const majorTrend = years.map((year, i) => {
-        const base = baseTrend[i] * 0.3; // Start with 30% major hurricanes
-        const increase = (year - 1980) * 0.05; // Gradual increase
-        const climateEffect = Math.max(0, (year - 2000) * 0.15); // Accelerated after 2000
-        return Math.max(2, base + increase + climateEffect);
-    });
-    
-    const margin = { top: 40, right: 30, bottom: 60, left: 70 };
-    const innerWidth = width - margin.left - margin.right;
-    const innerHeight = height - margin.top - margin.bottom;
-    
-    const x = d3.scaleLinear()
-        .domain([1980, 2022])
-        .range([0, innerWidth]);
-    
-    const y = d3.scaleLinear()
-        .domain([0, d3.max(baseTrend) * 1.1])
-        .range([innerHeight, 0])
-        .nice();
-    
-    const g = trendSvg.append('g')
-        .attr('transform', `translate(${margin.left},${margin.top})`);
-    
-    // Add gridlines (using CSS class 'grid')
-    g.append('g')
-        .attr('class', 'grid')
-        .call(d3.axisLeft(y)
-            .ticks(8)
-            .tickSize(-innerWidth)
-            .tickFormat(''));
-    
-    // Create area for total hurricanes
-    const area = d3.area()
-        .x((d, i) => x(years[i]))
-        .y0(innerHeight)
-        .y1(d => y(d))
-        .curve(d3.curveMonotoneX);
-    
-    g.append('path')
-        .datum(baseTrend)
-        .attr('class', 'area-total')
-        .attr('d', area)
-        .attr('fill', 'url(#total-gradient)')
-        .attr('opacity', 0.6);
-    
-    // Create line for total hurricanes
-    const line = d3.line()
-        .x((d, i) => x(years[i]))
-        .y(d => y(d))
-        .curve(d3.curveMonotoneX);
-    
-    g.append('path')
-        .datum(baseTrend)
-        .attr('class', 'line-total')
-        .attr('d', line)
-        .attr('fill', 'none')
-        .attr('stroke', '#3498db')
-        .attr('stroke-width', 3);
-    
-    // Create line for major hurricanes
-    g.append('path')
-        .datum(majorTrend)
-        .attr('class', 'line-major')
-        .attr('d', line)
-        .attr('fill', 'none')
-        .attr('stroke', '#e74c3c')
-        .attr('stroke-width', 3)
-        .attr('stroke-dasharray', '5,5');
-    
-    // Add data points
-    g.selectAll('.point-total')
-        .data(baseTrend)
-        .enter()
-        .append('circle')
-        .attr('class', 'point-total')
-        .attr('cx', (d, i) => x(years[i]))
-        .attr('cy', d => y(d))
-        .attr('r', 3)
-        .attr('fill', '#3498db')
-        .attr('stroke', 'white')
-        .attr('stroke-width', 1);
-    
-    g.selectAll('.point-major')
-        .data(majorTrend)
-        .enter()
-        .append('circle')
-        .attr('class', 'point-major')
-        .attr('cx', (d, i) => x(years[i]))
-        .attr('cy', d => y(d))
-        .attr('r', 3)
-        .attr('fill', '#e74c3c')
-        .attr('stroke', 'white')
-        .attr('stroke-width', 1);
-    
-    // Add axes
-    g.append('g')
-        .attr('class', 'x-axis')
-        .attr('transform', `translate(0,${innerHeight})`)
-        .call(d3.axisBottom(x).tickFormat(d3.format('d')).ticks(10));
-    
-    g.append('g')
-        .attr('class', 'y-axis')
-        .call(d3.axisLeft(y).ticks(8));
-    
-    // Add axis labels
-    g.append('text')
-        .attr('class', 'x-label')
-        .attr('x', innerWidth / 2)
-        .attr('y', innerHeight + margin.bottom - 10)
-        .attr('text-anchor', 'middle')
-        .style('font-size', '14px')
-        .text('Year');
-    
-    g.append('text')
-        .attr('class', 'y-label')
-        .attr('transform', 'rotate(-90)')
-        .attr('x', -innerHeight / 2)
-        .attr('y', -margin.left + 20)
-        .attr('text-anchor', 'middle')
-        .style('font-size', '14px')
-        .text('Number of Hurricanes');
-    
-    // Add chart title
-    g.append('text')
-        .attr('class', 'chart-title')
-        .attr('x', innerWidth / 2)
-        .attr('y', -10)
-        .attr('text-anchor', 'middle')
-        .style('font-size', '16px')
-        .style('font-weight', 'bold')
-        .text('Increasing Frequency of Major Hurricanes (1980-2022)');
-    
-    // Add gradient for area (retained in JS as it's SVG defs)
-    const defs = trendSvg.append('defs');
-    
-    const totalGradient = defs.append('linearGradient')
-        .attr('id', 'total-gradient')
-        .attr('x1', '0%')
-        .attr('y1', '0%')
-        .attr('x2', '0%')
-        .attr('y2', '100%');
-    
-    totalGradient.append('stop')
-        .attr('offset', '0%')
-        .attr('stop-color', '#3498db')
-        .attr('stop-opacity', 0.4);
-    
-    totalGradient.append('stop')
-        .attr('offset', '100%')
-        .attr('stop-color', '#3498db')
-        .attr('stop-opacity', 0.1);
-    
-    // Add trend statistics
-    const stats = trendSvg.append('g')
-        .attr('transform', `translate(${width - 300}, 80)`);
-    
-    stats.append('text')
-        .attr('x', 0)
-        .attr('y', 0)
-        .style('font-size', '14px')
-        .style('font-weight', 'bold')
-        .style('fill', '#2c3e50')
-        .text('Trend Statistics:');
-    
-    const statItems = [
-        { label: 'Major hurricanes (Cat 3+):', value: '+8% per decade', color: '#e74c3c' },
-        { label: 'Rapid intensification:', value: '+15% since 1980', color: '#f39c12' },
-        { label: 'Rainfall rates:', value: '+7% per °C warming', color: '#3498db' },
-        { label: 'Storm surge height:', value: '+4% per decade', color: '#2ecc71' }
-    ];
-    
-    statItems.forEach((item, i) => {
-        const yPos = 25 + i * 25;
+    d3.csv('./data/decade_hurricaneTotal_data.csv').then(data => {
+        data.forEach(d => {
+            d['Tropical Storms'] = +d['Tropical Storms'];
+            d.Hurricanes = +d.Hurricanes;
+            d['Major Hurricanes'] = +d['Major Hurricanes'];
+            const decadeMatch = d.Decade.match(/^(\d{4})/);
+            d.startYear = decadeMatch ? +decadeMatch[1] : null;
+        });
+
+        // Sort data by year (using all data, no filter)
+        const sortedData = data
+            .filter(d => d.startYear !== null)
+            .sort((a, b) => a.startYear - b.startYear);
+
+        // Create year-by-year data by interpolating between decades
+        // For each decade, assign the value to the midpoint year
+        const decadeData = sortedData.map(d => ({
+            year: d.startYear + 5, // Use midpoint of decade (e.g., 1851-1860 -> 1856)
+            tropicalStorms: d['Tropical Storms'],
+            hurricanes: d.Hurricanes,
+            majorHurricanes: d['Major Hurricanes']
+        }));
+
+        // Generate year-by-year data covering all decades (1850-2025)
+        const minYear = Math.floor(decadeData[0].year / 10) * 10; // Round down to nearest decade
+        const maxYear = Math.ceil(decadeData[decadeData.length - 1].year / 10) * 10; // Round up to nearest decade
+        const years = d3.range(minYear, maxYear + 1);
         
-        stats.append('text')
-            .attr('x', 0)
-            .attr('y', yPos)
-            .style('font-size', '12px')
-            .style('fill', '#666')
-            .text(item.label);
+        // Helper function to interpolate between decade points
+        const interpolate = (year, property) => {
+            // Handle edge cases: before first point or after last point
+            if (year < decadeData[0].year) {
+                return decadeData[0][property];
+            }
+            if (year > decadeData[decadeData.length - 1].year) {
+                return decadeData[decadeData.length - 1][property];
+            }
+            
+            // Find the two closest decade points
+            let before = decadeData[0];
+            let after = decadeData[decadeData.length - 1];
+            
+            for (let i = 0; i < decadeData.length - 1; i++) {
+                if (year >= decadeData[i].year && year <= decadeData[i + 1].year) {
+                    before = decadeData[i];
+                    after = decadeData[i + 1];
+                    break;
+                }
+            }
+            
+            // Linear interpolation
+            if (before.year === after.year) {
+                return before[property];
+            }
+            const t = (year - before.year) / (after.year - before.year);
+            return before[property] + (after[property] - before[property]) * t;
+        };
         
-        stats.append('text')
-            .attr('x', 180)
-            .attr('y', yPos)
-            .style('font-size', '12px')
+        // Interpolate all three trends
+        const tropicalStormsTrend = years.map(year => interpolate(year, 'tropicalStorms'));
+        const hurricanesTrend = years.map(year => interpolate(year, 'hurricanes'));
+        const majorHurricanesTrend = years.map(year => interpolate(year, 'majorHurricanes'));
+
+        const margin = { top: 40, right: 30, bottom: 60, left: 70 };
+        const innerWidth = width - margin.left - margin.right;
+        const innerHeight = height - margin.top - margin.bottom;
+        
+        const x = d3.scaleLinear()
+            .domain([minYear, maxYear])
+            .range([0, innerWidth]);
+        
+        // Find max value across all three datasets
+        const maxValue = Math.max(
+            d3.max(tropicalStormsTrend),
+            d3.max(hurricanesTrend),
+            d3.max(majorHurricanesTrend)
+        );
+        
+        const y = d3.scaleLinear()
+            .domain([0, maxValue * 1.1])
+            .range([innerHeight, 0])
+            .nice();
+        
+        const g = trendSvg.append('g')
+            .attr('transform', `translate(${margin.left},${margin.top})`);
+        
+        // Add gridlines (using CSS class 'grid')
+        g.append('g')
+            .attr('class', 'grid')
+            .call(d3.axisLeft(y)
+                .ticks(8)
+                .tickSize(-innerWidth)
+                .tickFormat(''));
+        
+        // Create line generator
+        const line = d3.line()
+            .x((d, i) => x(years[i]))
+            .y(d => y(d))
+            .curve(d3.curveMonotoneX);
+        
+        // Create line for tropical storms
+        g.append('path')
+            .datum(tropicalStormsTrend)
+            .attr('class', 'line-tropical-storms')
+            .attr('d', line)
+            .attr('fill', 'none')
+            .attr('stroke', '#2ecc71')
+            .attr('stroke-width', 3);
+        
+        // Create line for hurricanes
+        g.append('path')
+            .datum(hurricanesTrend)
+            .attr('class', 'line-hurricanes')
+            .attr('d', line)
+            .attr('fill', 'none')
+            .attr('stroke', '#3498db')
+            .attr('stroke-width', 3);
+        
+        // Create line for major hurricanes
+        g.append('path')
+            .datum(majorHurricanesTrend)
+            .attr('class', 'line-major-hurricanes')
+            .attr('d', line)
+            .attr('fill', 'none')
+            .attr('stroke', '#e74c3c')
+            .attr('stroke-width', 3)
+            .attr('stroke-dasharray', '5,5');
+        
+        // Add data points for tropical storms (only at decade points for clarity)
+        const tropicalStormsPoints = decadeData.map(d => ({
+            year: d.year,
+            value: d.tropicalStorms
+        }));
+        g.selectAll('.point-tropical-storms')
+            .data(tropicalStormsPoints)
+            .enter()
+            .append('circle')
+            .attr('class', 'point-tropical-storms')
+            .attr('cx', d => x(d.year))
+            .attr('cy', d => y(d.value))
+            .attr('r', 4)
+            .attr('fill', '#2ecc71')
+            .attr('stroke', 'white')
+            .attr('stroke-width', 1.5);
+        
+        // Add data points for hurricanes (only at decade points for clarity)
+        const hurricanesPoints = decadeData.map(d => ({
+            year: d.year,
+            value: d.hurricanes
+        }));
+        g.selectAll('.point-hurricanes')
+            .data(hurricanesPoints)
+            .enter()
+            .append('circle')
+            .attr('class', 'point-hurricanes')
+            .attr('cx', d => x(d.year))
+            .attr('cy', d => y(d.value))
+            .attr('r', 4)
+            .attr('fill', '#3498db')
+            .attr('stroke', 'white')
+            .attr('stroke-width', 1.5);
+        
+        // Add data points for major hurricanes (only at decade points for clarity)
+        const majorHurricanesPoints = decadeData.map(d => ({
+            year: d.year,
+            value: d.majorHurricanes
+        }));
+        g.selectAll('.point-major-hurricanes')
+            .data(majorHurricanesPoints)
+            .enter()
+            .append('circle')
+            .attr('class', 'point-major-hurricanes')
+            .attr('cx', d => x(d.year))
+            .attr('cy', d => y(d.value))
+            .attr('r', 4)
+            .attr('fill', '#e74c3c')
+            .attr('stroke', 'white')
+            .attr('stroke-width', 1.5);
+        
+        // Add axes
+        g.append('g')
+            .attr('class', 'x-axis')
+            .attr('transform', `translate(0,${innerHeight})`)
+            .call(d3.axisBottom(x).tickFormat(d3.format('d')).ticks(Math.min(12, Math.floor((maxYear - minYear) / 20))));
+        
+        g.append('g')
+            .attr('class', 'y-axis')
+            .call(d3.axisLeft(y).ticks(8));
+        
+        // Add axis labels
+        g.append('text')
+            .attr('class', 'x-label')
+            .attr('x', innerWidth / 2)
+            .attr('y', innerHeight + margin.bottom - 10)
+            .attr('text-anchor', 'middle')
+            .style('font-size', '14px')
+            .text('Year');
+        
+        g.append('text')
+            .attr('class', 'y-label')
+            .attr('transform', 'rotate(-90)')
+            .attr('x', -innerHeight / 2)
+            .attr('y', -margin.left + 20)
+            .attr('text-anchor', 'middle')
+            .style('font-size', '14px')
+            .text('Number of Storms');
+        
+        // Add chart title
+        g.append('text')
+            .attr('class', 'chart-title')
+            .attr('x', innerWidth / 2)
+            .attr('y', -10)
+            .attr('text-anchor', 'middle')
+            .style('font-size', '16px')
             .style('font-weight', 'bold')
-            .style('fill', item.color)
-            .text(item.value);
-    });
+            .text('Hurricane Trends Over Time (1850-2020)');
+        
+        // Add legend
+        const legend = g.append('g')
+            .attr('class', 'legend')
+            .attr('transform', `translate(${innerWidth - 200}, 20)`);
+        
+        const legendData = [
+            { label: 'Tropical Storms', color: '#2ecc71', stroke: 'none' },
+            { label: 'Hurricanes', color: '#3498db', stroke: 'none' },
+            { label: 'Major Hurricanes', color: '#e74c3c', stroke: '5,5' }
+        ];
+        
+        legendData.forEach((item, i) => {
+            const legendRow = legend.append('g')
+                .attr('transform', `translate(0, ${i * 25})`);
+            
+            legendRow.append('line')
+                .attr('x1', 0)
+                .attr('x2', 30)
+                .attr('y1', 0)
+                .attr('y2', 0)
+                .attr('stroke', item.color)
+                .attr('stroke-width', 3)
+                .attr('stroke-dasharray', item.stroke);
+            
+            legendRow.append('text')
+                .attr('x', 40)
+                .attr('y', 5)
+                .style('font-size', '12px')
+                .style('fill', '#2c3e50')
+                .text(item.label);
+        });
+    }); // Close .then() callback
 }
 
 function showDamageTooltip(event, data) {
@@ -561,22 +612,40 @@ export function onProgressDestructiveTrends(progress) {
             });
     } else if (currentView === 'trend' && trendSvg && progress > 0.3) {
         // Animate trend lines
-        const totalLength = trendSvg.select('.line-total').node().getTotalLength();
-        const majorLength = trendSvg.select('.line-major').node().getTotalLength();
+        const tropicalStormsLine = trendSvg.select('.line-tropical-storms').node();
+        const hurricanesLine = trendSvg.select('.line-hurricanes').node();
+        const majorHurricanesLine = trendSvg.select('.line-major-hurricanes').node();
         
-        trendSvg.select('.line-total')
-            .attr('stroke-dasharray', totalLength + ' ' + totalLength)
-            .attr('stroke-dashoffset', totalLength)
-            .transition()
-            .duration(2000)
-            .attr('stroke-dashoffset', 0);
+        if (tropicalStormsLine) {
+            const tropicalStormsLength = tropicalStormsLine.getTotalLength();
+            trendSvg.select('.line-tropical-storms')
+                .attr('stroke-dasharray', tropicalStormsLength + ' ' + tropicalStormsLength)
+                .attr('stroke-dashoffset', tropicalStormsLength)
+                .transition()
+                .duration(2000)
+                .attr('stroke-dashoffset', 0);
+        }
         
-        trendSvg.select('.line-major')
-            .attr('stroke-dasharray', majorLength + ' ' + majorLength)
-            .attr('stroke-dashoffset', majorLength)
-            .transition()
-            .duration(2000)
-            .delay(500)
-            .attr('stroke-dashoffset', 0);
+        if (hurricanesLine) {
+            const hurricanesLength = hurricanesLine.getTotalLength();
+            trendSvg.select('.line-hurricanes')
+                .attr('stroke-dasharray', hurricanesLength + ' ' + hurricanesLength)
+                .attr('stroke-dashoffset', hurricanesLength)
+                .transition()
+                .duration(2000)
+                .delay(300)
+                .attr('stroke-dashoffset', 0);
+        }
+        
+        if (majorHurricanesLine) {
+            const majorHurricanesLength = majorHurricanesLine.getTotalLength();
+            trendSvg.select('.line-major-hurricanes')
+                .attr('stroke-dasharray', majorHurricanesLength + ' ' + majorHurricanesLength)
+                .attr('stroke-dashoffset', majorHurricanesLength)
+                .transition()
+                .duration(2000)
+                .delay(600)
+                .attr('stroke-dashoffset', 0);
+        }
     }
 }
