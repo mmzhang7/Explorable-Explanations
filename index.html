@@ -1,33 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hurricane Viewer</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Hurricane Scrollarama</title>
+    
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="css/main.css">
+    
+    <!-- Scrollama library -->
+    <script type="importmap">
+    {
+        "imports": {
+            "d3": "https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm",
+            "scrollama": "https://cdn.jsdelivr.net/npm/scrollama@3.2.0/+esm"
+        }
+    }
+    </script>
+    
+    <!-- Main JS module -->
+    <script type="module" src="js/global.js"></script>
 </head>
-
 <body>
-    <h1>Hurricane Viewer</h1>
-    <div id="controls">
-        <button id="reset-view">Reset view</button>
-        <div id="status-message"></div>
-    </div>
-    <div id="app-container">
-        <div id="globe"></div>
-        <div id="ida-viewer" class="hidden">
-            <h2>Hurricane Ida (2021) CMI Time-Series</h2>
-        </div>
-        <div id="harvey-viewer" class="hidden">
-            <h2>Hurricane Harvey (2017) CMI Time-Series</h2>
-        </div>
-        <div id="ian-viewer" class="hidden">
-            <h2>Hurricane Ian (2022) CMI Time-Series</h2>
-        </div>
-    </div>
-    <a href="writeup/index.html">→ Read the Writeup</a>
-    <script type="module" src="main.js"></script>
+    <!-- Header -->
+    <header>
+        <h1>Understanding Hurricanes</h1>
+        <p>A scroll-driven exploration of hurricane science, impacts, and preparedness</p>
+    </header>
+    
+    <!-- Main scrollytelling container -->
+    <main id="scrollarama-container">
+        <!-- Hook Section -->
+        <section id="hook-section" class="scroll-section">
+            <div class="text-content">
+                <h2>Hook: Nature's Most Powerful Storms</h2>
+                <p>Every year, these massive rotating storms form over warm ocean waters, gathering energy and strength before unleashing their fury on coastal communities.</p>
+            </div>
+            <div id="hook-visualization" class="visualization"></div>
+        </section>
+        
+        <!-- What is a Hurricane Section -->
+        <section id="what-is-hurricane-section" class="scroll-section">
+            <div class="text-content">
+                <h2>What is a Hurricane?</h2>
+                <p>A hurricane is a rotating low-pressure weather system with sustained winds of at least 74 mph.</p>
+            </div>
+            <div id="anatomy-visualization" class="visualization"></div>
+        </section>
+        
+        <!-- Build Your Own Hurricane Section -->
+        <section id="build-hurricane-section" class="scroll-section">
+            <div class="text-content">
+                <h2>Build Your Own Hurricane</h2>
+                <p>Adjust these factors to see how they affect hurricane formation and intensity.</p>
+            </div>
+            <div id="build-hurricane-visualization" class="visualization"></div>
+        </section>
+        
+        <!-- Click on Different Hurricanes Section -->
+        <section id="click-hurricanes-section" class="scroll-section">
+            <div class="text-content">
+                <h2>Click on Different Hurricanes</h2>
+                <p>Explore historical hurricanes and their impacts.</p>
+            </div>
+            <div id="controls">
+                <button id="reset-view">Reset View</button>
+                <div id="status-message"></div>
+            </div>
+            <div id="cities-visualization" class="visualization"></div>
+        </section>
+        
+        <!-- Destructive Power & Trends Section -->
+        <section id="destructive-trends-section" class="scroll-section">
+            <div class="text-content">
+                <h2>Destructive Power & Increasing Trends</h2>
+                <p>Understanding hurricane damage and the concerning trends of increasing intensity.</p>
+            </div>
+            <div id="destructive-visualization" class="visualization"></div>
+        </section>
+        
+        <!-- Preparedness & Action Section -->
+        <section id="preparedness-action-section" class="scroll-section">
+            <div class="text-content">
+                <h2>Preparedness & Call to Action</h2>
+                <p>Lessons from unprepared cities and what we can do to prepare.</p>
+            </div>
+            <div id="action-visualization" class="visualization"></div>
+        </section>
+    </main>
+    
+    <!-- Progress indicator -->
+    <div id="progress-indicator"></div>
 </body>
-
 </html>
